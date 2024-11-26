@@ -1,0 +1,10 @@
+#home_button1, #home_button2, #home_button3 {
+height: 80px;
+background-color: #1e2d47;
+border: #1e2d47;
+}
+
+#home_button1:hover, #home_button2:hover, #home_button3:hover {
+background-color: #182434;
+}
+
