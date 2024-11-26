@@ -18,11 +18,11 @@
         {% endif %}
         {% endwith %}
         <form method="POST" enctype="multipart/form-data" action="/login">
-            {{ login_form.csrf_token() }}
-            {{ login_form.hidden_tag() }}
+            {{ form.csrf_token() }}
+            {{ form.hidden_tag() }}
 
             <div class="mb-3">
-                {{ login_form.password(class="form-control form-control-lg", id="password") }}
+                {{ form.password(class="form-control form-control-lg", id="password") }}
             </div>
             <button type="submit" class="btn btn-primary w-100">Submit</button>
         </form>

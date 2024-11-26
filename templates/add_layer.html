@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %} Add Layer {% endblock %}
+
+{% block content %}
+
+<br><br><br>
+<!-- Heading -->
+<div class="container text-left">
+    <div class="row">
+        <div class="col-6"><h2>Add a layer</h2></div>
+    </div>
+</div>
+<br><br>
+
+<!-- Add a layer Form -->
+<div class="container">
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token() }}
+        {{ form.hidden_tag() }}
+
+        <!-- Name input -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.name.label }} {{ form.name(class="form-control form-control-lg") }}
+            </div>
+        </div>
+        <br>
+        <!-- Group input -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.group.label }}
+
+                <!-- Dropdown Checkbox -->
+                <button
+                        class="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        id="group-dropdown"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#checkbox-container"
+                        aria-expanded="false"
+                        aria-controls="checkbox-container"
+                >
+                    Select Groups
+                </button>
+
+                <!-- Collapsible Checkbox -->
+                <div class="collapse mt-2" id="checkbox-container">
+                    {% for subfield in form.group %}
+                    <div class="form-check">
+                        <!-- Render Checkbox -->
+                        {{ subfield(**{'class': 'form-check-input'}) }}
+
+                        <!-- Checkbox Label -->
+                        <label class="form-check-label" for="{{ subfield.id }}">
+                            {{ subfield.label.text }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <br>
+        <!-- Submit button -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.submit(class="btn btn-primary", value="Submit", style="float: right;", id="submit_button") }}
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
