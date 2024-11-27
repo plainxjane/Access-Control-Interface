@@ -1,11 +1,16 @@
-// Reference the toggle button & dropdown menu for Add Layer page
-const toggleButton = document.getElementById('group-select');
-const dropdownMenu =document.getElementById('dropdown-menu');
+// Reference toggle buttons & dropdown menus in Add Layer page
+const departmentToggleButton = document.getElementById('department-select');
+const groupToggleButton = document.getElementById('group-select');
 
-// Track if the dropdown is open
-let isDropdownOpen = false;
+const departmentDropdownMenu = document.getElementById('department-dropdown');
+const groupDropdownMenu = document.getElementById('group-dropdown');
 
-// Prevent the dropdown from closing when clicking anywhere inside
-dropdownMenu.addEventListener('click', (event) => {
+
+// Prevent dropdown from closing when clicking anywhere inside 'Department' & 'Group'
+departmentDropdownMenu.addEventListener('click', (event) => {
+    event.stopPropagation(); // Stops the click event from propagating
+});
+
+groupDropdownMenu.addEventListener('click', (event) => {
     event.stopPropagation(); // Stops the click event from propagating
 });

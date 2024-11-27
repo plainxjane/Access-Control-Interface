@@ -4,4 +4,23 @@
 
 {% block content %}
 
+<br><br><br>
+<!-- Heading -->
+<div class="container text-left">
+    <div class="row">
+        <div class="col-6"><h2>Add a user</h2></div>
+    </div>
+</div>
+<br><br>
+
+<!--Add User Form -->
+<div class="container">
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token() }}
+        {{ form.hidden_tag() }}
+
+        <!-- Name Input -->
+
+    </form>
+</div>
 {% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %} Add Layer {% endblock %}
+
+{% block content %}
+
+<br><br><br>
+
+<!-- Layer Information Table -->
+<div class="container-fluid px-4">
+  <div class="row me-auto mb-2 mb-lg-0">
+    <h1>Layers Information</h1>
+  </div>
+  <div class="row mt-4">
+    <div class="col">
+      <table class="table" id="layers-table">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Department</th>
+          <th>Group</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>{{ row[1] }}</td> <!-- Name -->
+          <td>{{ row[2] }}</td> <!-- Department -->
+          <td>{{ row[3] }}</td> <!-- Group -->
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

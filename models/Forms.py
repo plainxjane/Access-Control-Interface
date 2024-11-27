@@ -11,14 +11,28 @@ class LoginForm(FlaskForm):
 
 
 class AddLayerForm(FlaskForm):
-    name = StringField('Name of layer')
-    group = SelectMultipleField('Select group to add layer to', choices=[('IDE General Viewers', 'IDE General Viewers'),
-                                                                         ('Editors_ARCH', 'Editors_ARCH'),
-                                                                         ('Editors_CRI', 'Editors_CRI'),
-                                                                         ('Editors_CSV', 'Editors_CSV'),
-                                                                         ('Editors_CTIPS', 'Editors_CTIPS'),
-                                                                         ('Editors_GTT', 'Editors_GTT'),
-                                                                         ('Editors_LAND', 'Editors_LAND')],
+    name = StringField('Name')
+    department = SelectMultipleField('Department to add layer to', choices=[('Architecture', 'Architecture'),
+                                                                            ('Commuter & Road Infrastructure (CRI)',
+                                                                             'Commuter & Road Infrastructure (CRI)'),
+                                                                            ('Geomatics & Survey (GSV)',
+                                                                             'Geomatics & Survey (GSV)'),
+                                                                            ('Geotechnical & Tunnels (GTT)',
+                                                                             'Geotechnical & Tunnels (GTT)'),
+                                                                            ('Land', 'Land'),
+                                                                            ('Project Management',
+                                                                             'Project Management')],
+                                     widget=ListWidget(prefix_label=False),
+                                     option_widget=CheckboxInput(),
+                                     )
+
+    group = SelectMultipleField('Group to add layer to', choices=[('IDE General Viewers', 'IDE General Viewers'),
+                                                                  ('Editors_ARCH', 'Editors_ARCH'),
+                                                                  ('Editors_CRI', 'Editors_CRI'),
+                                                                  ('Editors_CSV', 'Editors_CSV'),
+                                                                  ('Editors_CTIPS', 'Editors_CTIPS'),
+                                                                  ('Editors_GTT', 'Editors_GTT'),
+                                                                  ('Editors_LAND', 'Editors_LAND')],
                                 widget=ListWidget(prefix_label=False),
                                 option_widget=CheckboxInput(),
                                 )
@@ -26,7 +40,10 @@ class AddLayerForm(FlaskForm):
 
 
 class AddUserForm(FlaskForm):
-    pass
+    name = StringField('Name')
+    # editor =
+    # viewer =
+    submit = SubmitField('Submit')
 
 
 class UpdateUserForm(FlaskForm):
