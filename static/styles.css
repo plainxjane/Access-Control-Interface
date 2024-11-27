@@ -12,3 +12,8 @@
     background-color: #1e2d47;
     border: #1e2d47;
 }
+
+#group-select {
+    color: black;
+    background-color: transparent;
+}
