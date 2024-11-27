@@ -41,8 +41,8 @@ class AddLayerForm(FlaskForm):
 
 class AddUserForm(FlaskForm):
     name = StringField('Name')
-    # editor =
-    # viewer =
+    #editor =
+    #viewer =
     submit = SubmitField('Submit')
 
 
