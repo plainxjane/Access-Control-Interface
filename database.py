@@ -18,21 +18,21 @@ def init_db():
     conn.close()
 
 
-def populate_data():
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-    cursor.executemany('''
-    INSERT INTO layers (name, department, groups)
-    VALUES (?, ?, ?)
-    ''', [
-        ('Alice', 'Engineering', 'Group A'),
-        ('Bob', 'Marketing', 'Group B'),
-        ('Charlie', 'Finance', 'Group C')
-    ])
-    conn.commit()
-    conn.close()
+# def populate_test_data():
+#     conn = sqlite3.connect(DATABASE)
+#     cursor = conn.cursor()
+#     cursor.executemany('''
+#     INSERT INTO layers (name, department, groups)
+#     VALUES (?, ?, ?)
+#     ''', [
+#         ('Alice', 'Engineering', 'Group A'),
+#         ('Bob', 'Marketing', 'Group B'),
+#         ('Charlie', 'Finance', 'Group C')
+#     ])
+#     conn.commit()
+#     conn.close()
 
 
 if __name__=='__main__':
     init_db()
-    populate_data()
+    # populate_data()

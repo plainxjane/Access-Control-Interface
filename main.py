@@ -39,12 +39,40 @@ def add_layer():
     add_layer_form = AddLayerForm()
     if request.method == 'POST' and add_layer_form.validate_on_submit():
         name = add_layer_form.name.data
-        department = add_layer_form.department.data
-        group = add_layer_form.group.data
+        department = ', '.join(add_layer_form.department.data)      # convert python list into comma-separated string
+        groups = ', '.join(add_layer_form.groups.data)              # convert python list into comma-separated string
 
-        print("Layer added successfully!")
+        # insert into SQLite database
+        try:
+            conn = sqlite3.connect(DATABASE)
+            cursor = conn.cursor()
 
-    return render_template('add_layer.html', form=add_layer_form)
+            cursor.execute('''
+            INSERT INTO layers (name, department, groups)
+            VALUES (?, ?, ?)
+            ''', (name, department, groups))
+
+            conn.commit()
+            conn.close()
+
+            print("Layer added successfully!")
+            return redirect(url_for('layers'))
+
+        except sqlite3.Error as e:
+            print(f"An error: {e}")
+
+    else:
+        return render_template('add_layer.html', form=add_layer_form)
+
+
+@app.route('/layers')
+def layers():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM layers')
+    rows = cursor.fetchall()
+    print(rows)
+    return render_template('layers.html', rows=rows)
 
 
 @app.route('/add_user', methods=['POST', 'GET'])
@@ -59,19 +87,14 @@ def update_user():
     pass
 
 
+@app.route('/users')
+def users():
+    pass
+
+
 @app.route('/database')
 def database():
     return render_template('database.html')
-
-
-@app.route('/layers')
-def layers():
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM layers')
-    rows = cursor.fetchall()
-    print(rows)
-    return render_template('layers.html', rows=rows)
 
 
 if __name__ == '__main__':

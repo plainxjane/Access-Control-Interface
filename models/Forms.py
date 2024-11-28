@@ -26,7 +26,7 @@ class AddLayerForm(FlaskForm):
                                      option_widget=CheckboxInput(),
                                      )
 
-    group = SelectMultipleField('Group to add layer to', choices=[('IDE General Viewers', 'IDE General Viewers'),
+    groups = SelectMultipleField('Group to add layer to', choices=[('IDE General Viewers', 'IDE General Viewers'),
                                                                   ('Editors_ARCH', 'Editors_ARCH'),
                                                                   ('Editors_CRI', 'Editors_CRI'),
                                                                   ('Editors_CSV', 'Editors_CSV'),
