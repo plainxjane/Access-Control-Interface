@@ -41,8 +41,12 @@ class AddLayerForm(FlaskForm):
 
 class AddUserForm(FlaskForm):
     name = StringField('Name')
-    #editor =
-    #viewer =
+    editor = SelectMultipleField("Editor", choices=[], widget=ListWidget(prefix_label=False),
+                                 option_widget=CheckboxInput(), )
+    viewer = SelectMultipleField("Viewer", choices=[], widget=ListWidget(prefix_label=False),
+                                 option_widget=CheckboxInput(), )
+    download_attachments = SelectMultipleField("Download Attachments", choices=[],
+                                               widget=ListWidget(prefix_label=False), option_widget=CheckboxInput(), )
     submit = SubmitField('Submit')
 
 

@@ -38,7 +38,7 @@
                     <button
                         class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
                         type="button"
-                        id="department-select"
+                        id="button1"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
                         Select Department
@@ -46,7 +46,7 @@
                     </button>
 
                     <!-- Dropdown Menu with Checkboxes -->
-                    <div class="dropdown-menu p-3 w-100" id="department-dropdown">
+                    <div class="dropdown-menu p-3 w-100">
                         {% for subfield in form.department %}
                         <div class="form-check">
                             <!-- Render Checkbox -->
@@ -73,9 +73,9 @@
                 <div class="dropdown">
                     <!-- Dropdown Toggle Button -->
                     <button
-                        class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                        class="btn dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
                         type="button"
-                        id="group-select"
+                        id="button2"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
                         Select Group
@@ -83,7 +83,7 @@
                     </button>
 
                     <!-- Dropdown Menu with Checkboxes -->
-                    <div class="dropdown-menu p-3 w-100" id="group-dropdown">
+                    <div class="dropdown-menu p-3 w-100">
                         {% for subfield in form.groups %}
                             <div class="form-check">
                                 <!-- Render Checkbox -->

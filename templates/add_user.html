@@ -20,6 +20,130 @@
         {{ form.hidden_tag() }}
 
         <!-- Name Input -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.name.label }} {{ form.name(class="form-control form-control-md") }}
+            </div>
+        </div>
+        <br>
+
+        <!-- Editor Input -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.editor.label }}
+
+                <!-- Custom Dropdown Select -->
+                <div class="dropdown">
+                    <!-- Dropdown Toggle Button -->
+                    <button
+                            class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                            type="button"
+                            id="button3"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        Choose 'Editor' layers
+                        <span class="dropdown-icon"></span>
+                    </button>
+
+                    <!-- Dropdown Menu with Checkboxes -->
+                    <div class="dropdown-menu p-3 w-100">
+                        {% for subfield in form.editor %}
+                        <div class="form-check">
+                            <!-- Render Checkbox -->
+                            {{ subfield(**{'class': 'form-check-input'}) }}
+
+                            <!-- Checkbox Label -->
+                            <label class="form-check-label" for="{{ subfield.id }}">
+                                {{ subfield.label.text }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+
+        <!-- Viewer Input -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.viewer.label }}
+
+                <!-- Custom Dropdown Select -->
+                <div class="dropdown">
+                    <!-- Dropdown Toggle Button -->
+                    <button
+                            class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                            type="button"
+                            id="button4"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        Choose Viewer layers
+                        <span class="dropdown-icon"></span>
+                    </button>
+
+                    <!-- Dropdown Menu with Checkboxes -->
+                    <div class="dropdown-menu p-3 w-100">
+                        {% for subfield in form.viewer %}
+                        <div class="form-check">
+                            <!-- Render Checkbox -->
+                            {{ subfield(**{'class': 'form-check-input'}) }}
+
+                            <!-- Checkbox Label -->
+                            <label class="form-check-label" for="{{ subfield.id }}">
+                                {{ subfield.label.text }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+
+        <!-- Download Attachments Input -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.download_attachments.label }}
+
+                <!-- Custom Dropdown Select -->
+                <div class="dropdown">
+                    <!-- Dropdown Toggle Button -->
+                    <button
+                            class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                            type="button"
+                            id="button5"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        Choose Viewer layers
+                        <span class="dropdown-icon"></span>
+                    </button>
+
+                    <!-- Dropdown Menu with Checkboxes -->
+                    <div class="dropdown-menu p-3 w-100">
+                        {% for subfield in form.download_attachments %}
+                        <div class="form-check">
+                            <!-- Render Checkbox -->
+                            {{ subfield(**{'class': 'form-check-input'}) }}
+
+                            <!-- Checkbox Label -->
+                            <label class="form-check-label" for="{{ subfield.id }}">
+                                {{ subfield.label.text }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+
+        <!-- Submit button -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.submit(class="btn btn-primary", value="Submit", style="float: right;", id="submit_button") }}
+            </div>
+        </div>
 
     </form>
 </div>

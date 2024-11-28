@@ -79,7 +79,28 @@ def layers():
 def add_user():
     add_user_form = AddUserForm()
 
-    return render_template('add_user.html', form=add_user_form)
+    # query layers in database
+    db = get_db()
+    cursor = db.cursor()
+    query = ' SELECT id, name FROM layers '
+    cursor.execute(query)
+    layers = cursor.fetchall()
+
+    # populate the form choices with the layers in database
+    add_user_form.editor.choices = [str(layer[1]) for layer in layers ]
+    add_user_form.viewer.choices = [str(layer[1]) for layer in layers ]
+    add_user_form.download_attachments.choices = [str(layer[1]) for layer in layers ]
+
+    if request.method == 'POST' and add_user_form.validate_on_submit():
+        name = add_user_form.name.data
+        editor = add_user_form.editor.data
+        viewer = add_user_form.viewer.data
+        download_attachments = add_user_form.download_attachments.data
+
+        return redirect(url_for('layers'))
+
+    else:
+        return render_template('add_user.html', form=add_user_form)
 
 
 @app.route('/update_user', methods=['POST', 'GET'])
@@ -89,7 +110,7 @@ def update_user():
 
 @app.route('/users')
 def users():
-    pass
+    return render_template('users.html')
 
 
 @app.route('/database')
