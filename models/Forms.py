@@ -12,41 +12,34 @@ class LoginForm(FlaskForm):
 
 class AddLayerForm(FlaskForm):
     name = StringField('Name')
-    department = SelectMultipleField('Department to add layer to', choices=[('Architecture', 'Architecture'),
-                                                                            ('Commuter & Road Infrastructure (CRI)',
-                                                                             'Commuter & Road Infrastructure (CRI)'),
-                                                                            ('Geomatics & Survey (GSV)',
-                                                                             'Geomatics & Survey (GSV)'),
-                                                                            ('Geotechnical & Tunnels (GTT)',
-                                                                             'Geotechnical & Tunnels (GTT)'),
-                                                                            ('Land', 'Land'),
-                                                                            ('Project Management',
-                                                                             'Project Management')],
+    department = SelectMultipleField('Department to add layer to', choices=[],
                                      widget=ListWidget(prefix_label=False),
-                                     option_widget=CheckboxInput(),
-                                     )
+                                     option_widget=CheckboxInput(), )
 
-    groups = SelectMultipleField('Group to add layer to', choices=[('IDE General Viewers', 'IDE General Viewers'),
-                                                                  ('Editors_ARCH', 'Editors_ARCH'),
-                                                                  ('Editors_CRI', 'Editors_CRI'),
-                                                                  ('Editors_CSV', 'Editors_CSV'),
-                                                                  ('Editors_CTIPS', 'Editors_CTIPS'),
-                                                                  ('Editors_GTT', 'Editors_GTT'),
-                                                                  ('Editors_LAND', 'Editors_LAND')],
-                                widget=ListWidget(prefix_label=False),
-                                option_widget=CheckboxInput(),
-                                )
+    groups = SelectMultipleField('Group to add layer to', choices=[],
+                                 widget=ListWidget(prefix_label=False),
+                                 option_widget=CheckboxInput(),
+                                 )
     submit = SubmitField('Submit')
 
 
 class AddUserForm(FlaskForm):
     name = StringField('Name')
-    editor = SelectMultipleField("Editor", choices=[], widget=ListWidget(prefix_label=False),
+    department = SelectMultipleField("Choose user's department", choices=[],
+                                     widget=ListWidget(prefix_label=False),
+                                     option_widget=CheckboxInput())
+    group = SelectMultipleField("Choose user's group", choices=[],
+                                widget=ListWidget(prefix_label=False),
+                                option_widget=CheckboxInput())
+    editor = SelectMultipleField('Editor', choices=[],
+                                 widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
-    viewer = SelectMultipleField("Viewer", choices=[], widget=ListWidget(prefix_label=False),
+    viewer = SelectMultipleField('Viewer', choices=[],
+                                 widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
-    download_attachments = SelectMultipleField("Download Attachments", choices=[],
-                                               widget=ListWidget(prefix_label=False), option_widget=CheckboxInput(), )
+    download_attachments = SelectMultipleField('Download Attachments', choices=[],
+                                               widget=ListWidget(prefix_label=False),
+                                               option_widget=CheckboxInput(), )
     submit = SubmitField('Submit')
 
 

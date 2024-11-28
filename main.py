@@ -34,13 +34,55 @@ def login():
     return render_template('login.html', form=login_form)
 
 
+@app.route('/add_departments_groups', methods=['POST', 'GET'])
+def add_departments_groups():
+    pass
+
+
 @app.route('/add_layer', methods=['POST', 'GET'])
 def add_layer():
     add_layer_form = AddLayerForm()
+
+    # fetch existing departments & groups from database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # fetch unique departments
+    cursor.execute('SELECT DISTINCT department from layers')
+    departments = [row[0] for row in cursor.fetchall()]
+
+    # fetch unique groups
+    cursor.execute('SELECT DISTINCT groups from layers')
+    groups = [row[0] for row in cursor.fetchall()]
+
+    conn.close()
+
+    # populate dropdowns with existing departments & groups + 'Add New'
+    add_layer_form.department.choices = [(d,d) for d in departments] + [('Add New', 'Add New Department')]
+    add_layer_form.groups.choices = [(g, g) for g in groups] + [('Add New', 'Add New Group')]
+
     if request.method == 'POST' and add_layer_form.validate_on_submit():
         name = add_layer_form.name.data
-        department = ', '.join(add_layer_form.department.data)      # convert python list into comma-separated string
-        groups = ', '.join(add_layer_form.groups.data)              # convert python list into comma-separated string
+        selected_department = add_layer_form.department.data
+        selected_groups = add_layer_form.groups.data
+
+        # 'Add New' for departments
+        if 'Add New' in selected_department:
+            new_department = request.form.get('new_department', '').strip()
+            if new_department:
+                selected_department.remove("Add New")
+                selected_department.append(new_department)
+
+        # 'Add New' for groups
+        if 'Add New' in selected_groups:
+            new_group = request.form.get('new_group', '').strip()
+            if new_group:
+                selected_groups.remove("Add New")
+                selected_groups.append(new_group)
+
+        # convert selected lists into comma-separated strings
+        department_string = ', '.join(selected_department)
+        group_string = ', '.join(selected_groups)
 
         # insert into SQLite database
         try:
@@ -50,7 +92,7 @@ def add_layer():
             cursor.execute('''
             INSERT INTO layers (name, department, groups)
             VALUES (?, ?, ?)
-            ''', (name, department, groups))
+            ''', (name, department_string, group_string))
 
             conn.commit()
             conn.close()
@@ -108,7 +150,7 @@ def update_user():
     pass
 
 
-@app.route('/users')
+@app.route('/user_management')
 def users():
     return render_template('users.html')
 
