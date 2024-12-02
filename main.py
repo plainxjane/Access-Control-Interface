@@ -38,7 +38,6 @@ def login():
 def add_layer():
     add_layer_form = AddLayerForm()
 
-
     if request.method == 'POST' and add_layer_form.validate_on_submit():
         # process the form data
         name = add_layer_form.name.data
@@ -73,12 +72,12 @@ def add_layer():
 
 
 @app.route('/layers')
-def layers():
+def all_layers():
     db = get_db()
     cursor = db.cursor()
     cursor.execute('SELECT * FROM layers')
     rows = cursor.fetchall()
-    print(rows)
+
     return render_template('layers.html', rows=rows)
 
 
@@ -86,38 +85,76 @@ def layers():
 def add_user():
     add_user_form = AddUserForm()
 
-    # query layers in database
-    db = get_db()
-    cursor = db.cursor()
-    query = ' SELECT id, name FROM layers '
-    cursor.execute(query)
-    layers = cursor.fetchall()
-
-    # populate the form choices with the layers in database
-    add_user_form.editor.choices = [str(layer[1]) for layer in layers ]
-    add_user_form.viewer.choices = [str(layer[1]) for layer in layers ]
-    add_user_form.download_attachments.choices = [str(layer[1]) for layer in layers ]
-
     if request.method == 'POST' and add_user_form.validate_on_submit():
         name = add_user_form.name.data
+        departments = add_user_form.department.data
+        groups = add_user_form.groups.data
         editor = add_user_form.editor.data
         viewer = add_user_form.viewer.data
         download_attachments = add_user_form.download_attachments.data
 
-        return redirect(url_for('layers'))
+        # convert lists into comma-separated strings
+        department_string = ', '.join(departments)
+        group_string = ', '.join(groups)
+        editor_string = ', '.join(editor)
+        viewer_string = ', '.join(viewer)
+        download_attachments_string = ', '.join(download_attachments)
+
+        # insert into SQLite database
+        try:
+            conn = sqlite3.connect(DATABASE)
+            cursor = conn.cursor()
+
+            cursor.execute('''
+                    INSERT INTO users (name, department, groups, editor, viewer, download_attachments )
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    ''', (name, department_string, group_string, editor_string, viewer_string, download_attachments_string))
+
+            conn.commit()
+            conn.close()
+
+            print("User added successfully!")
+            return redirect(url_for('users'))
+
+        except sqlite3.Error as e:
+            print(f"An error: {e}")
 
     else:
         return render_template('add_user.html', form=add_user_form)
 
 
 @app.route('/update_user', methods=['POST', 'GET'])
-def update_user():
+def update_user(id):
     pass
 
 
-@app.route('/user_management')
-def users():
-    return render_template('users.html')
+@app.route('/users')
+def all_users():
+    db = get_db()
+    cursor = db.cursor()
+
+    #fetch users
+    cursor.execute('SELECT * FROM users')
+    users = cursor.fetchall()
+
+    # fetch layers
+    cursor.execute('SELECT name FROM layers')
+    layers = [row[0] for row in cursor.fetchall()]
+
+    # split user fields before passing to template
+    split_users = []
+    for user in users:
+        split_users.append({
+            'name': user[1],
+            'department': user[2].split(', '),
+            'groups': user[3].split(', '),
+            'editor': user[4].split(', '),
+            'viewer': user[5].split(', '),
+            'download_attachments': user[6].split(', '),
+        })
+
+
+    return render_template('users.html', users=split_users, layers=layers)
 
 
 @app.route('/database')

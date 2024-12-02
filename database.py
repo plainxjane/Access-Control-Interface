@@ -29,6 +29,18 @@ def init_db():
     )
     ''')
 
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL,
+        department TEXT NOT NULL,
+        groups TEXT NOT NULL, 
+        editor TEXT NOT NULL,
+        viewer TEXT NOT NULL,
+        download_attachments TEXT NOT NULL
+    )
+    ''')
+
     conn.commit()
     conn.close()
 
