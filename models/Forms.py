@@ -3,6 +3,9 @@ from wtforms import StringField, TextAreaField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 from wtforms import validators
 from wtforms.widgets import ListWidget, CheckboxInput
+import sqlite3
+
+DATABASE = 'database.db'
 
 
 class LoginForm(FlaskForm):
@@ -10,13 +13,29 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
-class AddLayerForm(FlaskForm):
-    name = StringField('Name')
-    department = SelectMultipleField('Department to add layer to', choices=[],
-                                     widget=ListWidget(prefix_label=False),
-                                     option_widget=CheckboxInput(), )
+def fetch_choices(table_name):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
 
-    groups = SelectMultipleField('Group to add layer to', choices=[],
+    # fetch data from the specified table
+    cursor.execute(f'SELECT name FROM {table_name}')
+    choices = [(row[0], row[0]) for row in cursor.fetchall()]
+
+    return choices
+
+
+class AddLayerForm(FlaskForm):
+    # dynamically populate choices for Departments & Groups
+    departments = fetch_choices('departments')
+    groups = fetch_choices('groups')
+
+    name = StringField('Name')
+    department = SelectMultipleField('Department to add layer to', choices=departments,
+                                     widget=ListWidget(prefix_label=False),
+                                     option_widget=CheckboxInput(),
+                                     )
+
+    groups = SelectMultipleField('Group to add layer to', choices=groups,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(),
                                  )

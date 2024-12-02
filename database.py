@@ -2,6 +2,7 @@ import sqlite3
 
 DATABASE = 'database.db'
 
+# Create Layers table
 def init_db():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -14,9 +15,51 @@ def init_db():
     )
     ''')
 
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS departments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS groups (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL
+    )
+    ''')
+
+    conn.commit()
+    conn.close()
+
+
+# Populate Departments & Groups
+def populate():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # Add initial departments
+    departments = ['Commuter & Road Infrastructure (CRI)', 'Geomatics & Survey (GSV)', 'Geotechnical & Tunnels (GTT)',
+                   'Land (LD)', 'Project Management', 'Road & Rail Systems Engineering (RSE)']
+    for department in departments:
+        cursor.execute('''
+        INSERT OR IGNORE INTO departments (name)
+        VALUES (?)
+        ''', (department,))
+
+    # Add initial groups
+    groups = ['Editors_Arch', 'Editors_CRI', 'Editors_CSV', 'Editors_CTIPS', 'Editors_GTT', 'Editors_LAND',
+              'Editors_RSE', 'IDE General Viewers']
+    for group in groups:
+        cursor.execute('''
+        INSERT OR IGNORE INTO groups (name)
+        VALUES (?)
+        ''', (group,))
+
     conn.commit()
     conn.close()
 
 
 if __name__=='__main__':
     init_db()
+    # populate()
