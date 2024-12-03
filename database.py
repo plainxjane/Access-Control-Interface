@@ -2,7 +2,7 @@ import sqlite3
 
 DATABASE = 'database.db'
 
-# Create Layers table
+# create tables
 def init_db():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -45,7 +45,7 @@ def init_db():
     conn.close()
 
 
-# Populate Departments & Groups
+# populate departments & groups for empty database file
 def populate():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()

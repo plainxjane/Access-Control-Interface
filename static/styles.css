@@ -18,3 +18,44 @@
     background-color: transparent;
     border: 1px solid black;
 }
+
+
+.table-header-rotated th.row-header{
+  width: auto;
+}
+
+.table-header-rotated td{
+  width: 20px;
+  border-top: 1px solid #dddddd;
+  border-left: 1px solid #dddddd;
+  border-right: 1px solid #dddddd;
+  vertical-align: middle;
+  text-align: left;
+}
+
+.table-header-rotated th.rotate-90{
+  height: 100px;
+  width: 40px;
+  min-width: 20px;
+  max-width: 40px;
+  position: relative;
+  vertical-align: middle;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.table-header-rotated th.rotate-90 > div{
+  position: absolute;
+  top: 50%;
+  left: 50%; /* 80 * tan(45) / 2 = 40 where 80 is the height on the cell and 45 is the transform angle*/
+  transform: translate(-50%, -50%) rotate(-90deg);
+  width: 80px;
+  whitespace: nowrap;
+}
+
+.table-header-rotated th.rotate-90 span {
+  display: block;
+  text-align: center;
+  word-wrap: break-word;
+}

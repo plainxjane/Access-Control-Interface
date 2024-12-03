@@ -13,21 +13,25 @@
     </div>
     <div class="row mt-4>">
         <div class="col">
-            <table class="table table-bordered" id="users-table">
+            <table class="table table-bordered table-header-rotated" id="users-table">
                 <thead>
+                <tr class="empty-row">
+                    <td colspan="{{ layers | length + 3 }}"></td>
+                </tr>
                 <tr>
                     <th>Name</th>
                     <th>Department</th>
                     <th>Group</th>
                     {% for layer in layers %}
-                    <th> {{ layer }} </th>
+                    <th class="rotate-90">
+                        <div>
+                            <span>{{ layer }}</span>
+                        </div>
+                    </th>
                     {% endfor %}
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="empty-row">
-                    <td colspan="{{ layers | length + 3 }}"></td>
-                </tr>
                 {% for user in users %}
                 <tr>
                     <!-- Name -->
