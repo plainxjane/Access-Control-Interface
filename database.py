@@ -51,7 +51,7 @@ def populate():
     cursor = conn.cursor()
 
     # Add initial departments
-    departments = ['Commuter & Road Infrastructure (CRI)', 'Geomatics & Survey (GSV)', 'Geotechnical & Tunnels (GTT)',
+    departments = ['Architecture', 'Commuter & Road Infrastructure (CRI)', 'Geomatics & Survey (GSV)', 'Geotechnical & Tunnels (GTT)',
                    'Land (LD)', 'Project Management', 'Road & Rail Systems Engineering (RSE)']
     for department in departments:
         cursor.execute('''

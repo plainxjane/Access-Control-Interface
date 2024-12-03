@@ -1,5 +1,6 @@
 from flask import Flask, g, flash, request, redirect, render_template, url_for
 from models.Forms import LoginForm, AddLayerForm, AddUserForm, UpdateUserForm
+from collections import defaultdict
 import sqlite3
 
 app = Flask(__name__)
@@ -7,6 +8,7 @@ DATABASE = 'database.db'
 
 # config app
 app.config['SECRET_KEY'] = 'SECRET_KEY'
+
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -108,7 +110,8 @@ def add_user():
             cursor.execute('''
                     INSERT INTO users (name, department, groups, editor, viewer, download_attachments)
                     VALUES (?, ?, ?, ?, ?, ?)
-                    ''', (name, department_string, group_string, editor_string, viewer_string, download_attachments_string))
+                    ''', (
+            name, department_string, group_string, editor_string, viewer_string, download_attachments_string))
 
             conn.commit()
             conn.close()
@@ -149,7 +152,7 @@ def update_user(user_id):
         updated_department = ', '.join(update_user_form.department.data)
         updated_groups = ', '.join(update_user_form.groups.data)
         updated_editor = ', '.join(update_user_form.editor.data)
-        updated_viewer = ', ' .join(update_user_form.viewer.data)
+        updated_viewer = ', '.join(update_user_form.viewer.data)
         updated_download_attachments = ', '.join(update_user_form.download_attachments.data)
 
         # update SQLite database
@@ -161,8 +164,9 @@ def update_user(user_id):
             SET name = ?, department = ?, groups = ?, editor = ?, viewer = ?, download_attachments = ?
             WHERE id = ?
             ''', (
-            updated_name, updated_department, updated_groups, updated_editor, updated_viewer, updated_download_attachments,
-            user_id))
+                updated_name, updated_department, updated_groups, updated_editor, updated_viewer,
+                updated_download_attachments,
+                user_id))
 
             conn.commit()
             conn.close()
@@ -185,8 +189,12 @@ def all_users():
     users = cursor.fetchall()
 
     # fetch layers
-    cursor.execute('SELECT name FROM layers')
-    layers = [row[0] for row in cursor.fetchall()]
+    cursor.execute('SELECT name, department FROM layers')
+    layers = cursor.fetchall()
+
+    # fetch departments
+    cursor.execute('SELECT name FROM departments')
+    departments = [dept[0] for dept in cursor.fetchall()]
 
     # split user fields before passing to template
     split_users = []
@@ -201,8 +209,7 @@ def all_users():
             'download_attachments': user[6].split(', '),
         })
 
-
-    return render_template('users.html', users=split_users, layers=layers)
+    return render_template('users.html', users=split_users, layers=layers, departments=departments)
 
 
 @app.route('/database')

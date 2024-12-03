@@ -17,7 +17,10 @@
                 <table class="table table-bordered table-header-rotated" id="users-table">
                     <thead>
                     <tr class="empty-row">
-                        <td colspan="{{ layers | length + 4 }}"></td>
+                        <td colspan="4"></td>
+                        {% for department in departments %}
+                        <td colspan="{{ departments | length }}" class="text-center">{{ department }}</td>
+                        {% endfor %}
                     </tr>
                     <tr>
                         <th style="width: 50px;"></th>
@@ -27,10 +30,10 @@
                         {% for layer in layers %}
                         <th class="rotate-90">
                             <div>
-                                <span>{{ layer }}</span>
+                                <span>{{ layer[0] }}</span>
                             </div>
                         </th>
-                        {% endfor %}
+                    {% endfor %}
                     </tr>
                     </thead>
                     <tbody>
@@ -59,13 +62,13 @@
                         <td>
                             {% set permissions= [] %}
 
-                            {% if layer in user.editor %}
+                            {% if layer[0] in user.editor %}
                             {% set permissions = permissions + ['E'] %}
                             {% endif %}
-                            {% if layer in user.viewer %}
+                            {% if layer[0] in user.viewer %}
                             {% set permissions = permissions + ['V'] %}
                             {% endif %}
-                            {% if layer in user.download_attachments %}
+                            {% if layer[0] in user.download_attachments %}
                             {% set permissions = permissions + ['D'] %}
                             {% endif %}
 
@@ -81,7 +84,6 @@
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
 </div>
