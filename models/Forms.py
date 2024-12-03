@@ -51,10 +51,10 @@ class AddUserForm(FlaskForm):
     name = StringField('Name')
     department = SelectMultipleField("Choose user's department", choices=departments,
                                      widget=ListWidget(prefix_label=False),
-                                     option_widget=CheckboxInput())
+                                     option_widget=CheckboxInput(), )
     groups = SelectMultipleField("Choose user's group", choices=groups,
                                 widget=ListWidget(prefix_label=False),
-                                option_widget=CheckboxInput())
+                                option_widget=CheckboxInput(), )
     editor = SelectMultipleField('Editor', choices=layers,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
@@ -68,4 +68,25 @@ class AddUserForm(FlaskForm):
 
 
 class UpdateUserForm(FlaskForm):
-    pass
+    # dynamically populate choices for Departments & Groups
+    departments = fetch_choices('departments')
+    groups = fetch_choices('groups')
+    layers = fetch_choices('layers')
+
+    name = StringField('Name')
+    department = SelectMultipleField("Choose user's department", choices=departments,
+                                     widget=ListWidget(prefix_label=False),
+                                     option_widget=CheckboxInput(),)
+    groups = SelectMultipleField("Choose user's group", choices=groups,
+                                 widget=ListWidget(prefix_label=False),
+                                 option_widget=CheckboxInput(), )
+    editor = SelectMultipleField('Editor', choices=layers,
+                                 widget=ListWidget(prefix_label=False),
+                                 option_widget=CheckboxInput(), )
+    viewer = SelectMultipleField('Viewer', choices=layers,
+                                 widget=ListWidget(prefix_label=False),
+                                 option_widget=CheckboxInput(), )
+    download_attachments = SelectMultipleField('Download Attachments', choices=layers,
+                                               widget=ListWidget(prefix_label=False),
+                                               option_widget=CheckboxInput(), )
+    submit = SubmitField('Submit')

@@ -45,7 +45,7 @@ def init_db():
     conn.close()
 
 
-# populate departments & groups for empty database file
+# populate departments & groups for EMPTY database file
 def populate():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()

@@ -13,33 +13,38 @@
     </div>
     <div class="row mt-4>">
         <div class="col">
-            <table class="table table-bordered table-header-rotated" id="users-table">
-                <thead>
-                <tr class="empty-row">
-                    <td colspan="{{ layers | length + 3 }}"></td>
-                </tr>
-                <tr>
-                    <th>Name</th>
-                    <th>Department</th>
-                    <th>Group</th>
-                    {% for layer in layers %}
-                    <th class="rotate-90">
-                        <div>
-                            <span>{{ layer }}</span>
-                        </div>
-                    </th>
-                    {% endfor %}
-                </tr>
-                </thead>
-                <tbody>
-                {% for user in users %}
-                <tr>
-                    <!-- Name -->
-                    <td> {{ user.name }}</td>
-                    <!-- Department -->
-                    <td>
-                        {% for dept in user.department %}
-                        {{ dept }} <br>
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="table table-bordered table-header-rotated" id="users-table">
+                    <thead>
+                    <tr class="empty-row">
+                        <td colspan="{{ layers | length + 4 }}"></td>
+                    </tr>
+                    <tr>
+                        <th style="width: 50px;"></th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Group</th>
+                        {% for layer in layers %}
+                        <th class="rotate-90">
+                            <div>
+                                <span>{{ layer }}</span>
+                            </div>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <a href="/update_user/{{ user.id }}"><i class="fa-regular fa-pen-to-square"></i></a>
+                        </td>
+                        <!-- Name -->
+                        <td>{{ user.name }}</td>
+                        <!-- Department -->
+                        <td>
+                            {% for dept in user.department %}
+                            {{ dept }} <br>
                             {% endfor %}
                         </td>
                         <!-- Group -->
@@ -70,11 +75,13 @@
                             &nbsp;
                             {% endif %}
                         </td>
-                    {% endfor %}
+                        {% endfor %}
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 </div>

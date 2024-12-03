@@ -62,7 +62,7 @@ def add_layer():
             conn.close()
 
             print("Layer added successfully!")
-            return redirect(url_for('layers'))
+            return redirect(url_for('all_layers'))
 
         except sqlite3.Error as e:
             print(f"An error: {e}")
@@ -106,7 +106,7 @@ def add_user():
             cursor = conn.cursor()
 
             cursor.execute('''
-                    INSERT INTO users (name, department, groups, editor, viewer, download_attachments )
+                    INSERT INTO users (name, department, groups, editor, viewer, download_attachments)
                     VALUES (?, ?, ?, ?, ?, ?)
                     ''', (name, department_string, group_string, editor_string, viewer_string, download_attachments_string))
 
@@ -123,9 +123,56 @@ def add_user():
         return render_template('add_user.html', form=add_user_form)
 
 
-@app.route('/update_user', methods=['POST', 'GET'])
-def update_user(id):
-    pass
+@app.route('/update_user/<int:user_id>', methods=['POST', 'GET'])
+def update_user(user_id):
+    # fetch user's data from database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE id = ?",
+                   (user_id,))
+    user_data = cursor.fetchone()
+    conn.close()
+
+    if not user_data:
+        print("User not found!")
+        return redirect(url_for('users'))
+
+    # create & populate the form
+    update_user_form = UpdateUserForm(name=user_data[1], department=user_data[2].split(', '),
+                                      groups=user_data[3].split(', '), editor=user_data[4].split(', '),
+                                      viewer=user_data[5].split(', '),
+                                      download_attachments=user_data[6].split(', '))
+
+    # update the user's information in database
+    if request.method == 'POST' and update_user_form.validate_on_submit():
+        updated_name = update_user_form.name.data
+        updated_department = ', '.join(update_user_form.department.data)
+        updated_groups = ', '.join(update_user_form.groups.data)
+        updated_editor = ', '.join(update_user_form.editor.data)
+        updated_viewer = ', ' .join(update_user_form.viewer.data)
+        updated_download_attachments = ', '.join(update_user_form.download_attachments.data)
+
+        # update SQLite database
+        try:
+            conn = sqlite3.connect(DATABASE)
+            cursor = conn.cursor()
+            cursor.execute('''
+            UPDATE users
+            SET name = ?, department = ?, groups = ?, editor = ?, viewer = ?, download_attachments = ?
+            WHERE id = ?
+            ''', (
+            updated_name, updated_department, updated_groups, updated_editor, updated_viewer, updated_download_attachments,
+            user_id))
+
+            conn.commit()
+            conn.close()
+
+            return redirect(url_for('all_users'))
+
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}", "error")
+
+    return render_template('update_user.html', form=update_user_form)
 
 
 @app.route('/users')
@@ -145,6 +192,7 @@ def all_users():
     split_users = []
     for user in users:
         split_users.append({
+            'id': user[0],
             'name': user[1],
             'department': user[2].split(', '),
             'groups': user[3].split(', '),
