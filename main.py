@@ -196,6 +196,14 @@ def all_users():
     cursor.execute('SELECT name FROM departments')
     departments = [dept[0] for dept in cursor.fetchall()]
 
+    # group layers by department
+    grouped_layers = {dept: [] for dept in departments}
+    for layer in layers:
+        department = layer[1]
+        if department in grouped_layers:
+            grouped_layers[department].append(layer[0])
+
+
     # split user fields before passing to template
     split_users = []
     for user in users:
@@ -209,7 +217,7 @@ def all_users():
             'download_attachments': user[6].split(', '),
         })
 
-    return render_template('users.html', users=split_users, layers=layers, departments=departments)
+    return render_template('users.html', users=split_users, grouped_layers=grouped_layers, departments=departments)
 
 
 @app.route('/database')

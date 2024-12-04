@@ -19,7 +19,7 @@
                     <tr class="empty-row">
                         <td colspan="4"></td>
                         {% for department in departments %}
-                        <td colspan="{{ departments | length }}" class="text-center">{{ department }}</td>
+                        <td colspan="{{ grouped_layers[department] | length or 1 }}" class="text-center">{{ department }}</td>
                         {% endfor %}
                     </tr>
                     <tr>
@@ -27,12 +27,17 @@
                         <th>Name</th>
                         <th>Department</th>
                         <th>Group</th>
-                        {% for layer in layers %}
+                        {% for department in departments %}
+                        {% for layer in grouped_layers[department] %}
                         <th class="rotate-90">
                             <div>
-                                <span>{{ layer[0] }}</span>
+                                <span>{{ layer }}</span>
                             </div>
                         </th>
+                    {% endfor %}
+                        {% if grouped_layers[department] | length == 0 %}
+                        <th></th>
+                        {% endif %}
                     {% endfor %}
                     </tr>
                     </thead>
@@ -58,17 +63,18 @@
                         </td>
 
                         <!--Permissions for each Layer -->
-                        {% for layer in layers %}
+                        {% for department in departments %}
+                        {% for layer in grouped_layers[department] %}
                         <td>
                             {% set permissions= [] %}
 
-                            {% if layer[0] in user.editor %}
+                            {% if layer in user.editor %}
                             {% set permissions = permissions + ['E'] %}
                             {% endif %}
-                            {% if layer[0] in user.viewer %}
+                            {% if layer in user.viewer %}
                             {% set permissions = permissions + ['V'] %}
                             {% endif %}
-                            {% if layer[0] in user.download_attachments %}
+                            {% if layer in user.download_attachments %}
                             {% set permissions = permissions + ['D'] %}
                             {% endif %}
 
@@ -78,6 +84,10 @@
                             &nbsp;
                             {% endif %}
                         </td>
+                        {% endfor %}
+                        {% if grouped_layers[department] | length == 0 %}
+                        <td></td>
+                        {% endif %}
                         {% endfor %}
                     </tr>
                     {% endfor %}
