@@ -3,4 +3,104 @@
 {% block title %} Table {% endblock %}
 
 {% block content %}
+
+<br><br><br>
+
+<!-- User Table -->
+<div class="container-fluid px-4">
+    <div class="row me-auto mb-2 mb-lg-0">
+        <h1>All Users</h1>
+    </div>
+    <div class="row mt-4>">
+        <div class="col">
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="table table-bordered table-header-rotated" id="users-table">
+                    <thead>
+                    <tr class="empty-row">
+                        <td colspan="4"></td>
+                        {% for department in departments %}
+                        <th colspan="{{ grouped_layers[department] | length or 1 }}" class="text-center" id="department_name">{{ department }}</th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th style="width: 50px;"></th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Group</th>
+                        {% for department in departments %}
+                        {% for layer in grouped_layers[department] %}
+                        <th class="rotate-90">
+                            <div>
+                                <span>{{ layer }}</span>
+                            </div>
+                        </th>
+                    {% endfor %}
+                        {% if grouped_layers[department] | length == 0 %}
+                        <th></th>
+                        {% endif %}
+                    {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <i class="fa-solid fa-circle-info"
+                                data-bs-toggle="popover"
+                                data-bs-title="{{ user.department[0] }}"
+                                data-bs-content="{{ user.groups | join('<br>') | safe }}"
+                                style="cursor: pointer"
+                                ></i>
+                        </td>
+                        <!-- Name -->
+                        <td>{{ user.name }}</td>
+                        <!-- Department -->
+                        <td>
+                            {% for dept in user.department %}
+                            {{ dept }} <br>
+                            {% endfor %}
+                        </td>
+                        <!-- Group -->
+                        <td>
+                            {% for grp in user.groups %}
+                            {{ grp }} <br>
+                            {% endfor %}
+                        </td>
+
+                        <!--Permissions for each Layer -->
+                        {% for department in departments %}
+                        {% for layer in grouped_layers[department] %}
+                        <td>
+                            {% set permissions= [] %}
+
+                            {% if layer in user.editor %}
+                            {% set permissions = permissions + ['E'] %}
+                            {% endif %}
+                            {% if layer in user.viewer %}
+                            {% set permissions = permissions + ['V'] %}
+                            {% endif %}
+                            {% if layer in user.download_attachments %}
+                            {% set permissions = permissions + ['D'] %}
+                            {% endif %}
+
+                            {% if permissions %}
+                            {{ permissions | join(' + ') }}
+                            {% else %}
+                            &nbsp;
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                        {% if grouped_layers[department] | length == 0 %}
+                        <td></td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

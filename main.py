@@ -203,6 +203,11 @@ def all_users():
         if department in grouped_layers:
             grouped_layers[department].append(layer[0])
 
+    # calculate the length of col-span
+    column_spans = {
+        dept: max(len(grouped_layers.get(dept, [])), 1) for dept in departments
+    }
+    total_column_spans = sum(column_spans.values())
 
     # split user fields before passing to template
     split_users = []
@@ -217,12 +222,55 @@ def all_users():
             'download_attachments': user[6].split(', '),
         })
 
-    return render_template('users.html', users=split_users, grouped_layers=grouped_layers, departments=departments)
+    return render_template('users.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
+                           departments=departments, total_column_spans=total_column_spans)
 
 
 @app.route('/database')
 def database():
-    return render_template('database.html')
+    db = get_db()
+    cursor = db.cursor()
+
+    # fetch users
+    cursor.execute('SELECT * FROM users')
+    users = cursor.fetchall()
+
+    # fetch layers
+    cursor.execute('SELECT name, department FROM layers')
+    layers = cursor.fetchall()
+
+    # fetch departments
+    cursor.execute('SELECT name FROM departments')
+    departments = [dept[0] for dept in cursor.fetchall()]
+
+    # group layers by department
+    grouped_layers = {dept: [] for dept in departments}
+    for layer in layers:
+        department = layer[1]
+        if department in grouped_layers:
+            grouped_layers[department].append(layer[0])
+
+    # calculate the length of col-span
+    column_spans = {
+        dept: max(len(grouped_layers.get(dept, [])), 1) for dept in departments
+    }
+    total_column_spans = sum(column_spans.values())
+
+    # split user fields before passing to template
+    split_users = []
+    for user in users:
+        split_users.append({
+            'id': user[0],
+            'name': user[1],
+            'department': user[2].split(', '),
+            'groups': user[3].split(', '),
+            'editor': user[4].split(', '),
+            'viewer': user[5].split(', '),
+            'download_attachments': user[6].split(', '),
+        })
+
+    return render_template('database.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
+                           departments=departments, total_column_spans=total_column_spans)
 
 
 if __name__ == '__main__':

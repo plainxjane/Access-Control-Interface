@@ -9,3 +9,13 @@ dropdownMenu.forEach((menu) => {
         event.stopPropagation(); // Stops the click event from propagating
     });
 });
+
+// Initialize Bootstrap popover function
+    document.addEventListener('DOMContentLoaded', function () {
+        var popoverElements = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        popoverElements.forEach(function (popoverElement) {
+            new bootstrap.Popover(popoverElement, {
+                html: true // Enable HTML content
+            });
+        });
+    });

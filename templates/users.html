@@ -19,7 +19,7 @@
                     <tr class="empty-row">
                         <td colspan="4"></td>
                         {% for department in departments %}
-                        <td colspan="{{ grouped_layers[department] | length or 1 }}" class="text-center">{{ department }}</td>
+                        <th colspan="{{ grouped_layers[department] | length or 1 }}" class="text-center" id="department_name">{{ department }}</th>
                         {% endfor %}
                     </tr>
                     <tr>
