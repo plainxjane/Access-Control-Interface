@@ -11,11 +11,18 @@ dropdownMenu.forEach((menu) => {
 });
 
 // Initialize Bootstrap popover function
-    document.addEventListener('DOMContentLoaded', function () {
-        var popoverElements = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-        popoverElements.forEach(function (popoverElement) {
-            new bootstrap.Popover(popoverElement, {
-                html: true // Enable HTML content
-            });
+document.addEventListener('DOMContentLoaded', function () {
+    var popoverElements = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    popoverElements.forEach(function (popoverElement) {
+        new bootstrap.Popover(popoverElement, {
+            html: true // Enable HTML content
         });
     });
+});
+
+// Download table as excel spreadsheet
+document.getElementById('download_excel').addEventListener('click', function () {
+    var table = document.getElementById("users-table"); // Replace with your table ID
+    var wb = XLSX.utils.table_to_book(table, { sheet: "Sheet 1" });
+    XLSX.writeFile(wb, "users_data.xlsx"); // Excel file name
+});

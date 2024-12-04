@@ -203,7 +203,7 @@ def all_users():
         if department in grouped_layers:
             grouped_layers[department].append(layer[0])
 
-    # calculate the length of col-span
+    # calculate the length of col-span dynamically
     column_spans = {
         dept: max(len(grouped_layers.get(dept, [])), 1) for dept in departments
     }
@@ -250,7 +250,7 @@ def database():
         if department in grouped_layers:
             grouped_layers[department].append(layer[0])
 
-    # calculate the length of col-span
+    # calculate the length of col-span dynamically
     column_spans = {
         dept: max(len(grouped_layers.get(dept, [])), 1) for dept in departments
     }
@@ -272,6 +272,9 @@ def database():
     return render_template('database.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
                            departments=departments, total_column_spans=total_column_spans)
 
+
+def search():
+    pass
 
 if __name__ == '__main__':
     app.run(debug=True)
