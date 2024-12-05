@@ -1,6 +1,5 @@
 from flask import Flask, g, flash, request, redirect, render_template, url_for
 from models.Forms import LoginForm, AddLayerForm, AddUserForm, UpdateUserForm
-from collections import defaultdict
 import sqlite3
 
 app = Flask(__name__)

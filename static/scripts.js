@@ -67,9 +67,19 @@ document.getElementById('download_excel').addEventListener('click', function () 
 
 // Search bar for users
 document.getElementById('search-btn').addEventListener('click', function () {
-        const query = document.getElementById('search-input').value;
-
-        // Redirect to the same page with the search query as a parameter
-        window.location.href = `/database?query=${encodeURIComponent(query)}`;
-
+        performSearch();
 });
+
+document.getElementById('search-input').addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        performSearch();
+    }
+});
+
+function performSearch() {
+    const query = document.getElementById('search-input').value;
+
+    // redirect to the same page with the search query as a parameter
+    window.location.href = `/database?query=${encodeURIComponent(query)}`;
+}
