@@ -117,10 +117,11 @@ def add_user():
             conn.close()
 
             print("User added successfully!")
-            return redirect(url_for('users'))
+            return redirect(url_for('all_users'))
 
         except sqlite3.Error as e:
             print(f"An error: {e}")
+            return render_template('add_user.html', form=add_user_form)
 
     else:
         return render_template('add_user.html', form=add_user_form)
@@ -226,13 +227,19 @@ def all_users():
                            departments=departments, total_column_spans=total_column_spans)
 
 
-@app.route('/database')
+@app.route('/database', methods=['GET'])
 def database():
     db = get_db()
     cursor = db.cursor()
 
-    # fetch users
-    cursor.execute('SELECT * FROM users')
+    # fetch search query (if any)
+    search_query = request.args.get('query', '').strip()
+
+    # fetch users based on search query
+    if search_query:
+        cursor.execute('SELECT * FROM users WHERE name LIKE ?', (f"%{search_query}%", ))
+    else:
+        cursor.execute('SELECT * FROM users')
     users = cursor.fetchall()
 
     # fetch layers
@@ -250,7 +257,7 @@ def database():
         if department in grouped_layers:
             grouped_layers[department].append(layer[0])
 
-    # calculate the length of col-span dynamically
+    # calculate column spans dynamically
     column_spans = {
         dept: max(len(grouped_layers.get(dept, [])), 1) for dept in departments
     }
@@ -272,9 +279,6 @@ def database():
     return render_template('database.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
                            departments=departments, total_column_spans=total_column_spans)
 
-
-def search():
-    pass
 
 if __name__ == '__main__':
     app.run(debug=True)

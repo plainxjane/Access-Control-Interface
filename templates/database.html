@@ -6,6 +6,28 @@
 
 <br><br><br>
 
+<!-- Search Bar -->
+<div class="container-fluid px-4">
+    <div class="row mt-4">
+        <div class="col"></div>
+        <div class="col"></div>
+        <div class="col"></div>
+        <div class="col">
+            <div class="input-group">
+                <input type="text" id="search-input" value="{{ query or '' }}" placeholder="Search user"
+                       class="form-control" />
+
+                <!-- Search icon from Font Awesome -->
+                <button id="search-btn" class="btn btn-outline-secondary" type="button">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br><br>
+
 <!-- User Table -->
 <div class="container-fluid px-4">
     <div class="row me-auto mb-2 mb-lg-0">
@@ -86,7 +108,7 @@
                             {% if permissions %}
                             {{ permissions | join(' + ') }}
                             {% else %}
-                            &nbsp;
+                            {{ 'NV' }}
                             {% endif %}
                         </td>
                         {% endfor %}

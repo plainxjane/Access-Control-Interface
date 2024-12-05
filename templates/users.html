@@ -35,6 +35,7 @@
                             </div>
                         </th>
                     {% endfor %}
+                        <!-- if no layers under that department, leave cell empty -->
                         {% if grouped_layers[department] | length == 0 %}
                         <th></th>
                         {% endif %}
@@ -71,7 +72,7 @@
                             {% if layer in user.editor %}
                             {% set permissions = permissions + ['E'] %}
                             {% endif %}
-                            {% if layer in user.viewer %}
+                            {% if layer in user.viewer%}
                             {% set permissions = permissions + ['V'] %}
                             {% endif %}
                             {% if layer in user.download_attachments %}
