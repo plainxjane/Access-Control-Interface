@@ -16,7 +16,7 @@
             <div class="table-responsive" style="overflow-x: auto;">
                 <table class="table table-bordered table-header-rotated" id="users-table">
                     <thead>
-                    <tr class="empty-row">
+                    <tr class="empty-row" id="empty_row_1">
                         <td colspan="4"></td>
                         {% for department in departments %}
                         <th colspan="{{ grouped_layers[department] | length or 1 }}" class="text-center" id="department_name">{{ department }}</th>
@@ -29,10 +29,8 @@
                         <th>Group</th>
                         {% for department in departments %}
                         {% for layer in grouped_layers[department] %}
-                        <th class="rotate-90">
-                            <div>
-                                <span>{{ layer }}</span>
-                            </div>
+                        <th class="rotate-90" id="layer_name">
+                            <span>{{ layer }}</span>
                         </th>
                     {% endfor %}
                         <!-- if no layers under that department, leave cell empty -->

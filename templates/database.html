@@ -4,18 +4,18 @@
 
 {% block content %}
 
-<br><br><br>
+<br><br>
 
 <!-- Search Bar -->
 <div class="container-fluid px-4">
     <div class="row mt-4 justify-content-end">
-        <div class="col-md-8"></div>
+        <div class="col-md-9"></div>
         <div class="col">
             <form id="search-form" action="/database" method="GET" class="d-flex align-items-center">
                 <div class="input-group">
                     <input type="text" id="search-input" name="query" value="{{ query or '' }}"
                            placeholder="Search user" class="form-control"/>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="search_button">
                         <i class="fa fa-search"></i>
                     </button>
                 </div>
@@ -69,7 +69,7 @@
                             <i class="fa-solid fa-circle-info"
                                 data-bs-toggle="popover"
                                 data-bs-title="{{ user.department[0] }}"
-                                data-bs-content="{{ user.groups | join('<br>') | safe }}"
+                                data-bs-content="{% for group in user.groups %}- {{group }}<br>{% endfor %}"
                                 style="cursor: pointer"
                                 ></i>
                         </td>

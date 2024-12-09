@@ -22,44 +22,34 @@
 /* to rotate the layers vertically */
 .table-header-rotated td{
   width: auto;
+  min-width: 80px;
   border-top: 1px solid #dddddd;
   border-left: 1px solid #dddddd;
   border-right: 1px solid #dddddd;
   vertical-align: middle;
   text-align: left;
   word-wrap: break-word;
+  whitespace: normal;
 }
 
-.table-header-rotated th.rotate-90{
-  height: 150px;
+.table-header-rotated th.rotate-90 {
+  height: 200px;
+  width: auto;
   min-width: 20px;
-  width: 80px;
   position: relative;
   vertical-align: middle;
-  padding: 0;
   font-size: 14px;
   line-height: 1;
   overflow: hidden;
   white-space: normal;
+  word-wrap: normal;
 }
 
-.table-header-rotated th.rotate-90 > div{
-  position: absolute;
-  top: 50%;
-  left: 50%; /* 80 * tan(45) / 2 = 40 where 80 is the height on the cell and 45 is the transform angle*/
-  transform: translate(-50%, -50%) rotate(-90deg);
-  word-wrap: break-word;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  flex-direction: column;
-}
-
+/* Rotated text for layer name */
 .table-header-rotated th.rotate-90 span {
-  display: block;
+  display: inline-block;
+  transform: rotate(-90deg);
+  transform-origin: center center;
   width: auto%;
   height: auto%;
   word-wrap: break-word;
@@ -67,19 +57,36 @@
   overflow-wrap: break-word;
   text-align: center;
   word-break: break-word;
+  max-width: 100%;
 }
 
-.table-header-rotated td {
-    text-align: center;
-    vertical-align: middle;
-}
-
+/* Responsive table wrappers */
 .table-responsive {
     overflow-x:auto;
 }
 
-/* change department name text color to red */
+/* Change department name text color to red */
 #department_name {
     color:red;
     border: 2px solid red;
+}
+
+/*Adjust table border size & colors */
+table.table-bordered {
+  border: 2px solid black; /* Adjust border size and color */
+}
+
+.table.table-bordered th,
+.table.table-bordered td,
+#empty_row_1 {
+  border: 2px solid black;
+}
+
+.table.table-bordered td, .table.table-bordered th {
+    border: 1px solid black;
+}
+
+#search_button {
+    background-color: #1e2d47;
+    border: #1e2d47;
 }
