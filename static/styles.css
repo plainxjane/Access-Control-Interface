@@ -4,7 +4,7 @@
     border: #1e2d47;
 }
 
-#home_button1:hover, #home_button2:hover, #home_button3:hover {
+#home_button1:hover, #home_button2:hover, #home_button3:hover, .submit-btn:hover {
     background-color: #182434;
 }
 

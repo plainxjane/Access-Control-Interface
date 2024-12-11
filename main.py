@@ -1,5 +1,6 @@
-from flask import Flask, g, flash, request, redirect, render_template, url_for
+from flask import Flask, g, flash, request, redirect, render_template, url_for, session
 from models.Forms import LoginForm, AddLayerForm, AddUserForm, UpdateUserForm
+from wrappers import login_required
 import sqlite3
 
 app = Flask(__name__)
@@ -17,6 +18,7 @@ def get_db():
 
 
 @app.route('/')
+@login_required
 def home():
     return render_template('homepage.html')
 
@@ -27,15 +29,27 @@ def login():
     if request.method == 'POST' and login_form.validate_on_submit():
         password = login_form.password.data
         if password == 'S&Lrail8':
-            flash('Login Successful!')
-            return redirect(url_for('database'))
+            session['logged_in'] = True
+            print("Login Successful!")
+
+            return redirect(url_for('home'))
         else:
-            flash('Login Unsuccessful. Please try again.')
+            flash('Login Unsuccessful. Please try again.', 'danger')
 
     return render_template('login.html', form=login_form)
 
 
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)      # remove login state
+    flash("You have been logged out.", 'info')
+    print("Logged out!")
+
+    return redirect(url_for('login'))
+
+
 @app.route('/add_layer', methods=['POST', 'GET'])
+@login_required
 def add_layer():
     add_layer_form = AddLayerForm()
 
@@ -62,7 +76,7 @@ def add_layer():
             conn.commit()
             conn.close()
 
-            print("Layer added successfully!")
+            print('Layer added successfully!')
             return redirect(url_for('all_layers'))
 
         except sqlite3.Error as e:
@@ -73,6 +87,7 @@ def add_layer():
 
 
 @app.route('/layers')
+@login_required
 def all_layers():
     db = get_db()
     cursor = db.cursor()
@@ -83,6 +98,7 @@ def all_layers():
 
 
 @app.route('/add_user', methods=['POST', 'GET'])
+@login_required
 def add_user():
     add_user_form = AddUserForm()
 
@@ -115,7 +131,7 @@ def add_user():
             conn.commit()
             conn.close()
 
-            print("User added successfully!")
+            print('User added successfully!')
             return redirect(url_for('all_users'))
 
         except sqlite3.Error as e:
@@ -127,11 +143,12 @@ def add_user():
 
 
 @app.route('/update_user/<int:user_id>', methods=['POST', 'GET'])
+@login_required
 def update_user(user_id):
     # fetch user's data from database
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE id = ?",
+    cursor.execute('SELECT * FROM users WHERE id = ?',
                    (user_id,))
     user_data = cursor.fetchone()
     conn.close()
@@ -180,6 +197,7 @@ def update_user(user_id):
 
 
 @app.route('/users')
+@login_required
 def all_users():
     db = get_db()
     cursor = db.cursor()
@@ -227,6 +245,7 @@ def all_users():
 
 
 @app.route('/database', methods=['GET'])
+@login_required
 def database():
     db = get_db()
     cursor = db.cursor()
@@ -234,7 +253,7 @@ def database():
     # fetch search query (if any)
     search_query = request.args.get('query', '').strip()
 
-    # fetch users based on search query
+    # fetch relevant users based on search query
     if search_query:
         cursor.execute('SELECT * FROM users WHERE name LIKE ?', (f"%{search_query}%", ))
     else:
@@ -276,7 +295,7 @@ def database():
         })
 
     return render_template('database.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
-                           departments=departments, total_column_spans=total_column_spans)
+                           departments=departments, total_column_spans=total_column_spans, query=search_query)
 
 
 if __name__ == '__main__':

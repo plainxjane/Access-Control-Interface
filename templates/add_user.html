@@ -22,7 +22,7 @@
         <!-- Name Input -->
         <div class="row mb-3">
             <div class="col-6">
-                {{ form.name.label }} {{ form.name(class="form-control form-control-md") }}
+                {{ form.name.label }} {{ form.name(class="form-control form-control-md", autocomplete="off") }}
             </div>
         </div>
         <br>
@@ -41,7 +41,7 @@
                         id="button1"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        Select Department
+                        Select user's department
                         <span class="dropdown-icon"></span>
                     </button>
 
@@ -78,7 +78,7 @@
                         id="button2"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        Select Group
+                        Select user's group
                         <span class="dropdown-icon"></span>
                     </button>
 
@@ -114,7 +114,7 @@
                             id="button3"
                             data-bs-toggle="dropdown"
                             aria-expanded="false">
-                        Choose 'Editor' layers
+                        Select 'Editor' layers
                         <span class="dropdown-icon"></span>
                     </button>
 
@@ -151,7 +151,7 @@
                             id="button4"
                             data-bs-toggle="dropdown"
                             aria-expanded="false">
-                        Choose 'Viewer' layers
+                        Select 'Viewer' layers
                         <span class="dropdown-icon"></span>
                     </button>
 
@@ -188,7 +188,7 @@
                             id="button5"
                             data-bs-toggle="dropdown"
                             aria-expanded="false">
-                        Choose 'Download Attachments' Layer
+                        Select 'Download Attachments' layers
                         <span class="dropdown-icon"></span>
                     </button>
 

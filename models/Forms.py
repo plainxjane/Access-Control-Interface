@@ -30,12 +30,12 @@ class AddLayerForm(FlaskForm):
     groups = fetch_choices('groups')
 
     name = StringField('Name')
-    department = SelectMultipleField('Department to add layer to', choices=departments,
+    department = SelectMultipleField('Department', choices=departments,
                                      widget=ListWidget(prefix_label=False),
                                      option_widget=CheckboxInput(),
                                      )
 
-    groups = SelectMultipleField('Group to add layer to', choices=groups,
+    groups = SelectMultipleField('Group', choices=groups,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(),
                                  )
@@ -49,10 +49,10 @@ class AddUserForm(FlaskForm):
     layers = fetch_choices('layers')
 
     name = StringField('Name')
-    department = SelectMultipleField("Choose user's department", choices=departments,
+    department = SelectMultipleField('Department', choices=departments,
                                      widget=ListWidget(prefix_label=False),
                                      option_widget=CheckboxInput(), )
-    groups = SelectMultipleField("Choose user's group", choices=groups,
+    groups = SelectMultipleField('Group', choices=groups,
                                 widget=ListWidget(prefix_label=False),
                                 option_widget=CheckboxInput(), )
     editor = SelectMultipleField('Editor', choices=layers,
@@ -74,10 +74,10 @@ class UpdateUserForm(FlaskForm):
     layers = fetch_choices('layers')
 
     name = StringField('Name')
-    department = SelectMultipleField("Choose user's department", choices=departments,
+    department = SelectMultipleField('Department', choices=departments,
                                      widget=ListWidget(prefix_label=False),
                                      option_widget=CheckboxInput(),)
-    groups = SelectMultipleField("Choose user's group", choices=groups,
+    groups = SelectMultipleField('Group', choices=groups,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
     editor = SelectMultipleField('Editor', choices=layers,
