@@ -23,27 +23,22 @@
                 </thead>
                 <tbody>
                 {% for row in rows %}
-
                 <tr>
                     <!-- Name -->
                     <td>{{ row[1] }}</td>
-
                     <!-- Department -->
                     <td>
                         {% for dept in row[2].split(', ') %}
                         {{ dept }} <br>
                         {% endfor %}
                     </td>
-
                     <!-- Group -->
                     <td>
                         {% for grp in row[3].split(', ') %}
-                        {{ grp }} <br>
+                        &bull; {{ grp }} <br>
                         {% endfor %}
                     </td>
-
                 </tr>
-
                 {% endfor %}
                 </tbody>
             </table>

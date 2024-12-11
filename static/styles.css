@@ -8,7 +8,7 @@
     background-color: #182434;
 }
 
-#submit_button {
+.submit-btn {
     background-color: #1e2d47;
     border: #1e2d47;
 }
@@ -69,6 +69,7 @@
 #department_name {
     color:red;
     border: 2px solid red;
+    vertical-align: middle;
 }
 
 /*Adjust table border size & colors */
@@ -86,6 +87,11 @@ table.table-bordered {
     border: 1px solid black;
 }
 
+#row_2 {
+    border-bottom: 2px solid black;
+}
+
+/* Adjust search bar's icon color */
 #search_button {
     background-color: #1e2d47;
     border: #1e2d47;
