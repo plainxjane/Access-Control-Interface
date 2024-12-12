@@ -260,15 +260,15 @@ def database():
         cursor.execute('SELECT * FROM users')
     users = cursor.fetchall()
 
-    # fetch layers
+    # fetch all layers
     cursor.execute('SELECT name, department FROM layers')
     layers = cursor.fetchall()
 
-    # fetch departments
+    # fetch all departments
     cursor.execute('SELECT name FROM departments')
     departments = [dept[0] for dept in cursor.fetchall()]
 
-    # group layers by department
+    # group layers under respective department
     grouped_layers = {dept: [] for dept in departments}
     for layer in layers:
         department = layer[1]

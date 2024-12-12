@@ -25,7 +25,7 @@ def fetch_choices(table_name):
 
 
 class AddLayerForm(FlaskForm):
-    # dynamically populate choices for Departments & Groups
+    # dynamically populate choices for Departments & Groups from sqlite database
     departments = fetch_choices('departments')
     groups = fetch_choices('groups')
 
@@ -43,7 +43,7 @@ class AddLayerForm(FlaskForm):
 
 
 class AddUserForm(FlaskForm):
-    # dynamically populate choices for Departments & Groups
+    # dynamically populate choices for Departments, Groups & Layers from sqlite database
     departments = fetch_choices('departments')
     groups = fetch_choices('groups')
     layers = fetch_choices('layers')
@@ -68,7 +68,7 @@ class AddUserForm(FlaskForm):
 
 
 class UpdateUserForm(FlaskForm):
-    # dynamically populate choices for Departments & Groups
+    # dynamically populate choices for Departments, Groups & Layers from sqlite database
     departments = fetch_choices('departments')
     groups = fetch_choices('groups')
     layers = fetch_choices('layers')
