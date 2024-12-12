@@ -33,11 +33,21 @@ document.getElementById('download_excel').addEventListener('click', function () 
 
     // Apply basic styling for borders and alignment
     const range = XLSX.utils.decode_range(worksheet['!ref']);
+
     for (let row = range.s.r; row <= range.e.r; row++) {
         for (let col = range.s.c; col <= range.e.c; col++) {
             const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
             if (!worksheet[cellAddress]) continue;
 
+            // Process the cells with multiple bullet points
+            let cellValue = worksheet[cellAddress].v || "";
+            if (typeof cellValue === "string") {
+                // Replace <br> tags with line breaks for Excel
+                cellValue = cellValue.replace(/<br\s*\/?>/gi, "\n");
+                worksheet[cellAddress].v = cellValue;
+            }
+
+            // Apply styling
             worksheet[cellAddress].s = {
                 border: {
                     top: { style: "thin", color: { rgb: "000000" } },
@@ -54,8 +64,20 @@ document.getElementById('download_excel').addEventListener('click', function () 
         }
     }
 
-    // Adjust column widths for better readability
-    worksheet['!cols'] = Array(range.e.c + 1).fill({ width: 20 });
+    // Dynamically adjust column widths
+    const colWidths = [];
+    for (let col = range.s.c; col <= range.e.c; col++) {
+        let maxWidth = 10;  // Minimum width
+        for (let row = range.s.r; row <= range.e.r; row++) {
+            const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+            const cellValue = worksheet[cellAddress] && worksheet[cellAddress].v !== undefined ? worksheet[cellAddress].v.toString(): "";
+            const cellLength = cellValue.length;
+            maxWidth = Math.max(maxWidth, cellLength);
+        }
+        colWidths.push({ width: maxWidth + 2 });        // Add padding for better readability
+    }
+
+    worksheet['!cols'] = colWidths;     // Set column widths
 
     // Create workbook and add worksheet
     const workbook = XLSX.utils.book_new();
