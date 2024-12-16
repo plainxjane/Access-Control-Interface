@@ -1,5 +1,3 @@
-from asyncio import SubprocessTransport
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, SelectMultipleField, SubmitField, PasswordField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
@@ -32,12 +30,12 @@ class AddLayerForm(FlaskForm):
     groups = fetch_choices('groups')
 
     name = StringField('Name')
-    department = SelectMultipleField('Department', choices=departments,
+    department = SelectMultipleField('Department', choices=departments, coerce=str,
                                      widget=ListWidget(prefix_label=False),
                                      option_widget=CheckboxInput(),
                                      )
 
-    groups = SelectMultipleField('Group', choices=groups,
+    groups = SelectMultipleField('Group', choices=groups, coerce=str,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(),
                                  )
@@ -51,19 +49,19 @@ class AddUserForm(FlaskForm):
     layers = fetch_choices('layers')
 
     name = StringField('Name')
-    department = SelectMultipleField('Department', choices=departments,
+    department = SelectMultipleField('Department', choices=departments, coerce=str,
                                      widget=ListWidget(prefix_label=False),
                                      option_widget=CheckboxInput(), )
-    groups = SelectMultipleField('Group', choices=groups,
+    groups = SelectMultipleField('Group', choices=groups, coerce=str,
                                 widget=ListWidget(prefix_label=False),
                                 option_widget=CheckboxInput(), )
-    editor = SelectMultipleField('Editor', choices=layers,
+    editor = SelectMultipleField('Editor', choices=layers, coerce=str,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
-    viewer = SelectMultipleField('Viewer', choices=layers,
+    viewer = SelectMultipleField('Viewer', choices=layers, coerce=str,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
-    download_attachments = SelectMultipleField('Download Attachments', choices=layers,
+    download_attachments = SelectMultipleField('Download Attachments', choices=layers, coerce=str,
                                                widget=ListWidget(prefix_label=False),
                                                option_widget=CheckboxInput(), )
     submit = SubmitField('Submit')
@@ -76,29 +74,29 @@ class UpdateUserForm(FlaskForm):
     layers = fetch_choices('layers')
 
     name = StringField('Name')
-    department = SelectMultipleField('Department', choices=departments,
+    department = SelectMultipleField('Department', choices=departments, coerce=str,
                                      widget=ListWidget(prefix_label=False),
                                      option_widget=CheckboxInput(),)
-    groups = SelectMultipleField('Group', choices=groups,
+    groups = SelectMultipleField('Group', choices=groups, coerce=str,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
-    editor = SelectMultipleField('Editor', choices=layers,
+    editor = SelectMultipleField('Editor', choices=layers, coerce=str,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
-    viewer = SelectMultipleField('Viewer', choices=layers,
+    viewer = SelectMultipleField('Viewer', choices=layers, coerce=str,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
-    download_attachments = SelectMultipleField('Download Attachments', choices=layers,
+    download_attachments = SelectMultipleField('Download Attachments', choices=layers, coerce=str,
                                                widget=ListWidget(prefix_label=False),
                                                option_widget=CheckboxInput(), )
     submit = SubmitField('Submit')
 
 
 class AddDepartmentForm(FlaskForm):
-    name = StringField('Department Name')
+    name = StringField('Department Name:')
     submit = SubmitField('Submit')
 
 
 class AddGroupForm(FlaskForm):
-    name = StringField('Group Name')
+    name = StringField('Group Name:')
     submit = SubmitField('Submit')

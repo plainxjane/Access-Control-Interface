@@ -11,7 +11,7 @@
             <!-- Add Department Form -->
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header text-white" style="background-color: #1e2d47">
                         <h4>Add Department</h4>
                     </div>
                     <div class="card-body">
@@ -19,9 +19,9 @@
                             {{ add_department_form.hidden_tag() }}
                             <div class="mb-3">
                                 {{ add_department_form.name.label(class="form-label") }}
-                                {{ add_department_form.name(class="form-control") }}
+                                {{ add_department_form.name(class="form-control", required=True) }}
                             </div>
-                            <button type="submit" name="add_department" class="btn btn-primary w-100">
+                            <button type="submit" name="add_department" class="btn w-100 text-white add-btn">
                                 Add Department
                             </button>
                         </form>
@@ -32,7 +32,7 @@
             <!-- Add Group Form -->
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header bg-secondary text-white">
+                    <div class="card-header text-white" style="background-color: #1e2d47">
                         <h4>Add Group</h4>
                     </div>
                     <div class="card-body">
@@ -40,9 +40,9 @@
                             {{ add_group_form.hidden_tag() }}
                             <div class="mb-3">
                                 {{ add_group_form.name.label(class="form-label") }}
-                                {{ add_group_form.name(class="form-control") }}
+                                {{ add_group_form.name(class="form-control", required=True) }}
                             </div>
-                            <button type="submit" name="add_group" class="btn btn-secondary w-100">
+                            <button type="submit" name="add_group" class="btn w-100 text-white add-btn">
                                 Add Group
                             </button>
                         </form>
@@ -59,7 +59,7 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>S/N</th>
                             <th>Name</th>
                         </tr>
                     </thead>
@@ -80,7 +80,7 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>S/N</th>
                             <th>Name</th>
                         </tr>
                     </thead>

@@ -54,6 +54,22 @@ def logout():
 def add_layer():
     add_layer_form = AddLayerForm()
 
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # fetch departments
+    cursor.execute('SELECT name FROM departments')
+    departments = [row[0] for row in cursor.fetchall()]
+
+    # fetch groups
+    cursor.execute('SELECT name FROM groups')
+    groups = [row[0] for row in cursor.fetchall()]
+
+    # dynamically populate form fields
+    add_layer_form.department.choices = [(dept, dept) for dept in departments]
+    add_layer_form.groups.choices = [(grp, grp) for grp in groups]
+
     if request.method == 'POST' and add_layer_form.validate_on_submit():
         # process the form data
         name = add_layer_form.name.data
@@ -66,9 +82,6 @@ def add_layer():
 
         # insert into SQLite database
         try:
-            conn = sqlite3.connect(DATABASE)
-            cursor = conn.cursor()
-
             cursor.execute('''
             INSERT INTO layers (name, department, groups)
             VALUES (?, ?, ?)
@@ -83,8 +96,9 @@ def add_layer():
         except sqlite3.Error as e:
             print(f"An error: {e}")
 
-    else:
-        return render_template('add_layer.html', form=add_layer_form)
+    conn.close()
+
+    return render_template('add_layer.html', form=add_layer_form)
 
 
 @app.route('/layers')
@@ -103,7 +117,32 @@ def all_layers():
 def add_user():
     add_user_form = AddUserForm()
 
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # fetch departments
+    cursor.execute('SELECT name FROM departments')
+    departments = [row[0] for row in cursor.fetchall()]
+
+    # fetch groups
+    cursor.execute('SELECT name FROM groups')
+    groups = [row[0] for row in cursor.fetchall()]
+
+    # fetch layers
+    cursor.execute('SELECT name FROM layers')
+    layers = [row[0] for row in cursor.fetchall()]
+
+    # dynamically populate form choices
+    add_user_form.department.choices = [(dept, dept) for dept in departments]
+    add_user_form.groups.choices = [(grp, grp) for grp in groups]
+    add_user_form.editor.choices = [(layer, layer) for layer in layers]
+    add_user_form.viewer.choices = [(layer, layer) for layer in layers]
+    add_user_form.viewer.choices = [(layer, layer) for layer in layers]
+    add_user_form.download_attachments.choices = [(layer, layer) for layer in layers]
+
     if request.method == 'POST' and add_user_form.validate_on_submit():
+        # process the form data
         name = add_user_form.name.data
         departments = add_user_form.department.data
         groups = add_user_form.groups.data
@@ -120,9 +159,6 @@ def add_user():
 
         # insert into SQLite database
         try:
-            conn = sqlite3.connect(DATABASE)
-            cursor = conn.cursor()
-
             cursor.execute('''
                     INSERT INTO users (name, department, groups, editor, viewer, download_attachments)
                     VALUES (?, ?, ?, ?, ?, ?)
