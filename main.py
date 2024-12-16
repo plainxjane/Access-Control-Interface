@@ -1,5 +1,5 @@
 from flask import Flask, g, flash, request, redirect, render_template, url_for, session
-from models.Forms import LoginForm, AddLayerForm, AddUserForm, UpdateUserForm
+from models.Forms import LoginForm, AddLayerForm, AddUserForm, UpdateUserForm, AddDepartmentForm, AddGroupForm
 from wrappers import login_required
 import sqlite3
 
@@ -41,7 +41,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('logged_in', None)      # remove login state
+    # remove login state
+    session.pop('logged_in', None)
     flash("You have been logged out.", 'info')
     print("Logged out!")
 
@@ -202,7 +203,7 @@ def all_users():
     db = get_db()
     cursor = db.cursor()
 
-    #fetch users
+    # fetch users
     cursor.execute('SELECT * FROM users')
     users = cursor.fetchall()
 
@@ -296,6 +297,66 @@ def database():
 
     return render_template('database.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
                            departments=departments, total_column_spans=total_column_spans, query=search_query)
+
+
+@app.route('/add_department_group', methods=['POST', 'GET'])
+def add_department_group():
+    # connect to SQLite database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # fetch department
+    cursor.execute('SELECT * FROM departments')
+    departments = cursor.fetchall()
+
+    # fetch groups
+    cursor.execute('SELECT * FROM groups')
+    groups = cursor.fetchall()
+
+    add_department_form = AddDepartmentForm()
+    add_group_form = AddGroupForm()
+
+    if request.method == 'POST':
+        # process the 'Add Department' form
+        if add_department_form.validate_on_submit() and 'add_department' in request.form:
+            department_name = add_department_form.name.data
+
+            # insert into Departments table in SQLite database
+            try:
+                cursor.execute('''
+                            INSERT INTO departments (name) VALUES (?)
+                            ''', (department_name,))
+
+                conn.commit()
+                conn.close()
+
+                return redirect(url_for('add_department_group'))
+
+            except sqlite3.Error as e:
+                print(f"An error has occurred: {e}")
+
+        # process the 'Add Group' form
+        elif add_group_form.validate_on_submit() and 'add_group' in request.form:
+            group_name = add_group_form.name.data
+
+            # insert into Groups table in SQLite database
+            try:
+                cursor.execute('''
+                            INSERT INTO groups (name) VALUES (?)
+                            ''', (group_name,))
+
+                conn.commit()
+                conn.close()
+
+                return redirect(url_for('add_department_group'))
+
+            except sqlite3.Error as e:
+                print(f"An error has occurredL {e}")
+
+    else:
+        return render_template('add_department_group.html', departments=departments, groups=groups,
+                           add_department_form=add_department_form,
+                           add_group_form=add_group_form)
 
 
 if __name__ == '__main__':

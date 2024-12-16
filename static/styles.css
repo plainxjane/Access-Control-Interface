@@ -46,19 +46,34 @@
 }
 
 /* Rotated text for layer name */
-.table-header-rotated th.rotate-90 span {
-  display: inline-block;
-  transform: rotate(-90deg);
-  transform-origin: center center;
-  width: auto%;
-  height: auto%;
-  word-wrap: break-word;
-  white-space: normal;
-  overflow-wrap: break-word;
-  text-align: center;
-  word-break: break-word;
-  max-width: 100%;
+.table-header-rotated th.rotate-90 div.rotate-90 {
+    position: relative;
+    display: inline-block;
+    transform: rotate(-90deg);
+    transform-origin: center center;
+    width: 100%;
+    height: auto;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: center;
+    word-break: break-word;
 }
+
+div.rotate-90 {
+    position: relative;
+    display: inline-block;
+    transform: rotate(-90deg);
+    transform-origin: center center;
+    width: 100%;
+    height: 100%;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: center;
+    word-break: break-word;
+}
+
 
 /* Responsive table wrappers */
 .table-responsive {
@@ -67,12 +82,12 @@
 
 /* Change department name text color to red */
 #department_name {
-    color:red;
+    color: red;
     border: 2px solid red;
     vertical-align: middle;
 }
 
-/*Adjust table border size & colors */
+/* Adjust table border size & colors */
 table.table-bordered {
   border: 2px solid black; /* Adjust border size and color */
 }
@@ -83,7 +98,8 @@ table.table-bordered {
   border: 2px solid black;
 }
 
-.table.table-bordered td, .table.table-bordered th {
+.table.table-bordered td,
+.table.table-bordered th {
     border: 1px solid black;
 }
 

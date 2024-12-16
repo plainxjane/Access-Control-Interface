@@ -1,3 +1,5 @@
+from asyncio import SubprocessTransport
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, SelectMultipleField, SubmitField, PasswordField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
@@ -89,4 +91,14 @@ class UpdateUserForm(FlaskForm):
     download_attachments = SelectMultipleField('Download Attachments', choices=layers,
                                                widget=ListWidget(prefix_label=False),
                                                option_widget=CheckboxInput(), )
+    submit = SubmitField('Submit')
+
+
+class AddDepartmentForm(FlaskForm):
+    name = StringField('Department Name')
+    submit = SubmitField('Submit')
+
+
+class AddGroupForm(FlaskForm):
+    name = StringField('Group Name')
     submit = SubmitField('Submit')

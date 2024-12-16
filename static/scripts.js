@@ -1,4 +1,4 @@
-// Reference toggle buttons & dropdown menus in Add Layer page
+// Reference toggle buttons & dropdown menus in Add Layer/Add User/Update User pages
 const toggleButton = document.querySelectorAll('.dropdown-toggle');
 const dropdownMenu = document.querySelectorAll('.dropdown-menu');
 
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Download Users table as Excel sheet
+// Download table as Excel sheet
 document.getElementById('download_excel').addEventListener('click', function () {
     const table = document.getElementById('users-table');
     if (!table) {
@@ -102,6 +102,6 @@ document.getElementById('search-input').addEventListener('keydown', function (ev
 function performSearch() {
     const query = document.getElementById('search-input').value;
 
-    // redirect to the same page with the search query as a parameter
+    // Redirect to the same page with the search query as a parameter
     window.location.href = `/database?query=${encodeURIComponent(query)}`;
 }
