@@ -10,13 +10,6 @@ DATABASE = 'database.db'
 app.config['SECRET_KEY'] = 'SECRET_KEY'
 
 
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    return db
-
-
 @app.route('/')
 @login_required
 def home():
@@ -104,8 +97,10 @@ def add_layer():
 @app.route('/layers')
 @login_required
 def all_layers():
-    db = get_db()
-    cursor = db.cursor()
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
     cursor.execute('SELECT * FROM layers')
     rows = cursor.fetchall()
 
@@ -230,14 +225,37 @@ def update_user(user_id):
         except sqlite3.Error as e:
             print(f"An error occurred: {e}", "error")
 
-    return render_template('update_user.html', form=update_user_form)
+    return render_template('update_user.html', form=update_user_form, user_data=user_data)
+
+
+@app.route('/delete_user/<int:user_id>', methods=['POST', 'GET'])
+@login_required
+def delete_user(user_id):
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        try:
+            cursor.execute('''
+                            DELETE FROM users WHERE id = ?
+                            ''', (user_id, ))
+            conn.commit()
+            conn.close()
+            print("User deleted successfully!")
+
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}", "error")
+
+        return redirect(url_for('all_users'))
 
 
 @app.route('/users')
 @login_required
 def all_users():
-    db = get_db()
-    cursor = db.cursor()
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
 
     # fetch users
     cursor.execute('SELECT * FROM users')
@@ -284,8 +302,9 @@ def all_users():
 @app.route('/database', methods=['GET'])
 @login_required
 def database():
-    db = get_db()
-    cursor = db.cursor()
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
 
     # fetch search query (if any)
     search_query = request.args.get('query', '').strip()
@@ -336,12 +355,13 @@ def database():
 
 
 @app.route('/add_department_group', methods=['POST', 'GET'])
+@login_required
 def add_department_group():
     # connect to SQLite database
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
-    # fetch department
+    # fetch departments
     cursor.execute('SELECT * FROM departments')
     departments = cursor.fetchall()
 
@@ -387,7 +407,7 @@ def add_department_group():
                 return redirect(url_for('add_department_group'))
 
             except sqlite3.Error as e:
-                print(f"An error has occurredL {e}")
+                print(f"An error has occurred {e}")
 
     else:
         return render_template('add_department_group.html', departments=departments, groups=groups,

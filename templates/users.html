@@ -21,6 +21,7 @@
                         <th>Name</th>
                         <th>Department</th>
                         <th>Group</th>
+                        <th>Delete User</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -43,7 +44,13 @@
                             &bull; {{ grp }} <br>
                             {% endfor %}
                         </td>
-                    {% endfor %}
+                        <!-- Delete User -->
+                        <td style="width: 100px">
+                            <form action="/delete_user/{{ user.id }}" method="POST">
+                                <button type="submit" class="btn btn-danger">X</button>
+                            </form>
+                        </td>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
