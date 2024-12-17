@@ -26,6 +26,7 @@ def login():
             print("Login Successful!")
 
             return redirect(url_for('home'))
+
         else:
             flash('Login Unsuccessful. Please try again.', 'danger')
 
@@ -33,6 +34,7 @@ def login():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     # remove login state
     session.pop('logged_in', None)
@@ -59,7 +61,7 @@ def add_layer():
     cursor.execute('SELECT name FROM groups')
     groups = [row[0] for row in cursor.fetchall()]
 
-    # dynamically populate form fields
+    # update form fields
     add_layer_form.department.choices = [(dept, dept) for dept in departments]
     add_layer_form.groups.choices = [(grp, grp) for grp in groups]
 
@@ -102,20 +104,32 @@ def update_layer(layer_id):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
+    # fetch layers
     cursor.execute('SELECT * FROM layers WHERE id = ?',
                    (layer_id,))
     layer_data = cursor.fetchone()
-    conn.close()
 
     if not layer_data:
         print("Layer not found!")
         return redirect(url_for('all_layers'))
 
+    # fetch departments
+    cursor.execute('SELECT name FROM departments')
+    departments = [row[0] for row in cursor.fetchall()]
+
+    # fetch groups
+    cursor.execute('SELECT name FROM groups')
+    groups = [row[0] for row in cursor.fetchall()]
+
     # initialize the update layer form
     update_layer_form = UpdateLayerForm(name=layer_data[1],  department=layer_data[2].split(', '),
                                       groups=layer_data[3].split(', '))
 
-    # populate the form with existing data
+    # update form fields
+    update_layer_form.department.choices = [(dept, dept) for dept in departments]
+    update_layer_form.groups.choices = [(grp, grp) for grp in groups]
+
+    # process form submission
     if request.method == 'POST' and update_layer_form.validate_on_submit():
         updated_name = update_layer_form.name.data
         updated_department = update_layer_form.department.data
@@ -143,9 +157,6 @@ def update_layer(layer_id):
             print(f"An error occurred: {e}", "error")
 
     return render_template('update_layer.html', form=update_layer_form, layer_data=layer_data)
-
-
-
 
 
 @app.route('/delete_layer/<int:layer_id>', methods=['POST', 'GET'])
@@ -179,6 +190,7 @@ def all_layers():
 
     cursor.execute('SELECT * FROM layers')
     rows = cursor.fetchall()
+    conn.close()
 
     return render_template('layers.html', rows=rows)
 
@@ -204,16 +216,15 @@ def add_user():
     cursor.execute('SELECT name FROM layers')
     layers = [row[0] for row in cursor.fetchall()]
 
-    # dynamically populate form choices
+    # update form fields
     add_user_form.department.choices = [(dept, dept) for dept in departments]
     add_user_form.groups.choices = [(grp, grp) for grp in groups]
     add_user_form.editor.choices = [(layer, layer) for layer in layers]
     add_user_form.viewer.choices = [(layer, layer) for layer in layers]
-    add_user_form.viewer.choices = [(layer, layer) for layer in layers]
     add_user_form.download_attachments.choices = [(layer, layer) for layer in layers]
 
+    # process form submission
     if request.method == 'POST' and add_user_form.validate_on_submit():
-        # process the form data
         name = add_user_form.name.data
         departments = add_user_form.department.data
         groups = add_user_form.groups.data
@@ -259,11 +270,22 @@ def update_user(user_id):
     cursor.execute('SELECT * FROM users WHERE id = ?',
                    (user_id,))
     user_data = cursor.fetchone()
-    conn.close()
 
     if not user_data:
         print("User not found!")
         return redirect(url_for('all_users'))
+
+    # fetch departments
+    cursor.execute('SELECT name FROM departments')
+    departments = [row[0] for row in cursor.fetchall()]
+
+    # fetch groups
+    cursor.execute('SELECT name FROM groups')
+    groups = [row[0] for row in cursor.fetchall()]
+
+    # fetch layers
+    cursor.execute('SELECT name FROM layers')
+    layers = [row[0] for row in cursor.fetchall()]
 
     # initialize the update user form
     update_user_form = UpdateUserForm(name=user_data[1], department=user_data[2].split(', '),
@@ -271,7 +293,14 @@ def update_user(user_id):
                                       viewer=user_data[5].split(', '),
                                       download_attachments=user_data[6].split(', '))
 
-    # populate the form with existing data
+    # update form fields
+    update_user_form.department.choices = [(dept, dept) for dept in departments]
+    update_user_form.groups.choices = [(grp, grp) for grp in groups]
+    update_user_form.editor.choices = [(layer, layer) for layer in layers]
+    update_user_form.viewer.choices = [(layer, layer) for layer in layers]
+    update_user_form.download_attachments.choices = [(layer, layer) for layer in layers]
+
+    # process form submission
     if request.method == 'POST' and update_user_form.validate_on_submit():
         updated_name = update_user_form.name.data
         updated_department = ', '.join(update_user_form.department.data)
@@ -372,6 +401,8 @@ def all_users():
             'download_attachments': user[6].split(', '),
         })
 
+    conn.close()
+
     return render_template('users.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
                            departments=departments, total_column_spans=total_column_spans)
 
@@ -426,6 +457,8 @@ def database():
             'viewer': user[5].split(', '),
             'download_attachments': user[6].split(', '),
         })
+
+    conn.close()
 
     return render_template('database.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
                            departments=departments, total_column_spans=total_column_spans, query=search_query)
