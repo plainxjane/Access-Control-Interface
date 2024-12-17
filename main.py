@@ -1,5 +1,5 @@
 from flask import Flask, g, flash, request, redirect, render_template, url_for, session
-from models.Forms import LoginForm, AddLayerForm, AddUserForm, UpdateUserForm, AddDepartmentForm, AddGroupForm
+from models.Forms import LoginForm, AddLayerForm, UpdateLayerForm, AddUserForm, UpdateUserForm, AddDepartmentForm, AddGroupForm
 from wrappers import login_required
 import sqlite3
 
@@ -92,6 +92,76 @@ def add_layer():
     conn.close()
 
     return render_template('add_layer.html', form=add_layer_form)
+
+
+@app.route('/update_layer/<int:layer_id>', methods=['POST', 'GET'])
+@login_required
+def update_layer(layer_id):
+
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM layers WHERE id = ?',
+                   (layer_id,))
+    layer_data = cursor.fetchone()
+    conn.close()
+
+    if not layer_data:
+        print("Layer not found!")
+        return redirect(url_for('all_layers'))
+
+    # initialize the update layer form
+    update_layer_form = UpdateLayerForm(name=layer_data[1],  department=layer_data[2].split(', '),
+                                      groups=layer_data[3].split(', '))
+
+    # populate the form with existing data
+    if request.method == 'POST' and update_layer_form.validate_on_submit():
+        updated_name = update_layer_form.name.data
+        updated_department = update_layer_form.department.data
+        updated_groups = update_layer_form.groups.data
+
+        # convert lists into comma-separated strings
+        department_string = ', '.join(updated_department)
+        group_string = ', '.join(updated_groups)
+
+        # update sqlite database
+        try:
+            conn = sqlite3.connect(DATABASE)
+            cursor = conn.cursor()
+            cursor.execute('''
+                        UPDATE layers
+                        SET name = ?, department = ?, groups = ?
+                        WHERE id = ?
+                    ''', (updated_name, department_string, group_string, layer_id, ))
+            conn.commit()
+            conn.close()
+
+            return redirect(url_for('all_layers'))
+
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}", "error")
+
+    return render_template('update_layer.html', form=update_layer_form, layer_data=layer_data)
+
+
+
+
+
+@app.route('/delete_layer/<int:layer_id>', methods=['POST', 'GET'])
+@login_required
+def delete_layer(layer_id):
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        try:
+            pass
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}", "error")
+
+        return redirect(url_for('all_layers'))
 
 
 @app.route('/layers')
@@ -187,15 +257,15 @@ def update_user(user_id):
 
     if not user_data:
         print("User not found!")
-        return redirect(url_for('users'))
+        return redirect(url_for('all_users'))
 
-    # create & populate the form
+    # initialize the update user form
     update_user_form = UpdateUserForm(name=user_data[1], department=user_data[2].split(', '),
                                       groups=user_data[3].split(', '), editor=user_data[4].split(', '),
                                       viewer=user_data[5].split(', '),
                                       download_attachments=user_data[6].split(', '))
 
-    # update the user's information in database
+    # populate the form with existing data
     if request.method == 'POST' and update_user_form.validate_on_submit():
         updated_name = update_user_form.name.data
         updated_department = ', '.join(update_user_form.department.data)
