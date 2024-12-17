@@ -157,11 +157,17 @@ def delete_layer(layer_id):
 
     if request.method == 'POST':
         try:
-            pass
+            cursor.execute('''
+                        DELETE FROM layers WHERE id = ?
+                        ''', (layer_id, ))
+            conn.commit()
+            conn.close()
+            print("Layer deleted successfully!")
+
         except sqlite3.Error as e:
             print(f"An error occurred: {e}", "error")
 
-        return redirect(url_for('all_layers'))
+    return redirect(url_for('all_layers'))
 
 
 @app.route('/layers')

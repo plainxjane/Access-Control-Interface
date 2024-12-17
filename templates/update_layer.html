@@ -106,15 +106,16 @@
                 {{ form.submit(class="btn btn-primary submit-btn", value="Save changes", style="float: right;", id="submit_button") }}
             </div>
         </div>
+    </form>
 
-        <!-- Delete Button -->
-        <div class="row mb-3">
+     <!-- Delete Button -->
+         <div class="row mb-3">
             <div class="col-6">
-                {{ form.submit(class="btn btn-danger", value="Delete layer", style="float: right;",
-                id="submit_button") }}
+                <form action="/delete_layer/{{layer_data[0]}}" method="POST">
+                    <button class="btn btn-danger" style="float: right;">Delete layer</button>
+                </form>
             </div>
         </div>
-    </form>
 </div>
 
 {% endblock %}
