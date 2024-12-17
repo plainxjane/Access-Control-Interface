@@ -295,10 +295,10 @@ def update_user(user_id):
         except sqlite3.Error as e:
             print(f"An error occurred: {e}", "error")
 
-    return render_template('update_user.html', form=update_user_form, user_data=user_data)
+    return render_template('update_user.html', form=update_user_form, user_data=user_data, user_id=user_id)
 
 
-@app.route('/delete_user/<int:user_id>', methods=['POST', 'GET'])
+@app.route('/delete_user/<int:user_id>', methods=['POST'])
 @login_required
 def delete_user(user_id):
     # connect to database
@@ -314,10 +314,11 @@ def delete_user(user_id):
             conn.close()
             print("User deleted successfully!")
 
+
         except sqlite3.Error as e:
             print(f"An error occurred: {e}", "error")
 
-        return redirect(url_for('all_users'))
+    return redirect(url_for('all_users'))
 
 
 @app.route('/users')
