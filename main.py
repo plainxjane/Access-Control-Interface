@@ -1,5 +1,6 @@
 from flask import Flask, g, flash, request, redirect, render_template, url_for, session
-from models.Forms import LoginForm, AddLayerForm, UpdateLayerForm, AddUserForm, UpdateUserForm, AddDepartmentForm, AddGroupForm
+from models.Forms import LoginForm, AddLayerForm, UpdateLayerForm, AddUserForm, UpdateUserForm, AddDepartmentForm, \
+    AddGroupForm
 from wrappers import login_required
 import sqlite3
 
@@ -99,7 +100,6 @@ def add_layer():
 @app.route('/update_layer/<int:layer_id>', methods=['POST', 'GET'])
 @login_required
 def update_layer(layer_id):
-
     # connect to database
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -122,8 +122,8 @@ def update_layer(layer_id):
     groups = [row[0] for row in cursor.fetchall()]
 
     # initialize the update layer form
-    update_layer_form = UpdateLayerForm(name=layer_data[1],  department=layer_data[2].split(', '),
-                                      groups=layer_data[3].split(', '))
+    update_layer_form = UpdateLayerForm(name=layer_data[1], department=layer_data[2].split(', '),
+                                        groups=layer_data[3].split(', '))
 
     # update form fields
     update_layer_form.department.choices = [(dept, dept) for dept in departments]
@@ -147,7 +147,7 @@ def update_layer(layer_id):
                         UPDATE layers
                         SET name = ?, department = ?, groups = ?
                         WHERE id = ?
-                    ''', (updated_name, department_string, group_string, layer_id, ))
+                    ''', (updated_name, department_string, group_string, layer_id,))
             conn.commit()
             conn.close()
 
@@ -170,7 +170,7 @@ def delete_layer(layer_id):
         try:
             cursor.execute('''
                         DELETE FROM layers WHERE id = ?
-                        ''', (layer_id, ))
+                        ''', (layer_id,))
             conn.commit()
             conn.close()
             print("Layer deleted successfully!")
@@ -181,22 +181,30 @@ def delete_layer(layer_id):
     return redirect(url_for('all_layers'))
 
 
-@app.route('/layers')
+@app.route('/layers', methods=['GET'])
 @login_required
 def all_layers():
     # connect to database
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
-    # fetch all layers
-    cursor.execute('''
-                SELECT * FROM layers
-                ORDER BY name ASC
-                ''')
+    # fetch all distinct departments
+    cursor.execute('SELECT name FROM departments')
+    departments = [row[0] for row in cursor.fetchall()]
+
+    # get selected departments
+    selected_department = request.args.get('department', 'all')
+
+    # fetch layers filtered by selected departments
+    if selected_department and selected_department != 'all':
+        cursor.execute('SELECT * FROM layers WHERE department = ? ORDER BY name ASC', (selected_department, ))
+    else:
+        cursor.execute('SELECT * FROM layers ORDER BY name ASC')
+
     rows = cursor.fetchall()
     conn.close()
 
-    return render_template('layers.html', rows=rows)
+    return render_template('layers.html', rows=rows, departments=departments, selected_department=selected_department)
 
 
 @app.route('/add_user', methods=['POST', 'GET'])
@@ -249,7 +257,7 @@ def add_user():
                     INSERT INTO users (name, department, groups, editor, viewer, download_attachments)
                     VALUES (?, ?, ?, ?, ?, ?)
                     ''', (
-            name, department_string, group_string, editor_string, viewer_string, download_attachments_string))
+                name, department_string, group_string, editor_string, viewer_string, download_attachments_string))
 
             conn.commit()
             conn.close()
@@ -348,7 +356,7 @@ def delete_user(user_id):
         try:
             cursor.execute('''
                             DELETE FROM users WHERE id = ?
-                            ''', (user_id, ))
+                            ''', (user_id,))
             conn.commit()
             conn.close()
             print("User deleted successfully!")
@@ -359,21 +367,21 @@ def delete_user(user_id):
     return redirect(url_for('all_users'))
 
 
-@app.route('/users')
+@app.route('/users', methods=['GET'])
 @login_required
 def all_users():
-    sort_order = request.args.get('sort', 'asc')
-
     # connect to database
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
-    if sort_order == 'asc':
-        cursor.execute('SELECT * FROM users ORDER BY name ASC')
-    else:
-        cursor.execute('SELECT * FROM users ORDER BY name DESC')
+    # fetch search query (if any)
+    search_query = request.args.get('query', '').strip()
 
-    # fetch users
+    # fetch relevant users based on search query
+    if search_query:
+        cursor.execute('SELECT * FROM users WHERE name LIKE ?', (f"%{search_query}%",))
+    else:
+        cursor.execute('SELECT * FROM users')
     users = cursor.fetchall()
 
     # fetch layers
@@ -413,7 +421,7 @@ def all_users():
     conn.close()
 
     return render_template('users.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
-                           departments=departments, total_column_spans=total_column_spans, sort_order=sort_order)
+                           departments=departments, total_column_spans=total_column_spans, query=search_query)
 
 
 @app.route('/database', methods=['GET'])
@@ -428,7 +436,7 @@ def database():
 
     # fetch relevant users based on search query
     if search_query:
-        cursor.execute('SELECT * FROM users WHERE name LIKE ?', (f"%{search_query}%", ))
+        cursor.execute('SELECT * FROM users WHERE name LIKE ?', (f"%{search_query}%",))
     else:
         cursor.execute('SELECT * FROM users')
     users = cursor.fetchall()
