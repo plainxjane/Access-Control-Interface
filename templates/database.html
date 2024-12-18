@@ -37,16 +37,14 @@
                 <table class="table table-bordered table-header-rotated" id="users-table">
                     <thead>
                     <tr class="empty-row">
-                        <td colspan="4"></td>
+                        <td colspan="2"></td>
                         {% for department in departments %}
                         <th colspan="{{ grouped_layers[department] | length or 1 }}" class="text-center" id="department_name">{{ department }}</th>
                         {% endfor %}
                     </tr>
                     <tr>
                         <th style="width: 50px;"></th>
-                        <th>Name</th>
-                        <th>Department</th>
-                        <th>Group</th>
+                        <th style="width: 150px;">Name</th>
                         {% for department in departments %}
                         {% for layer in grouped_layers[department] %}
                         <th class="rotate-90">
@@ -72,19 +70,6 @@
                         </td>
                         <!-- Name -->
                         <td>{{ user.name }}</td>
-                        <!-- Department -->
-                        <td>
-                            {% for dept in user.department %}
-                            {{ dept }} <br>
-                            {% endfor %}
-                        </td>
-                        <!-- Group -->
-                        <td>
-                            {% for grp in user.groups %}
-                            &bull; {{ grp }} <br>
-                            {% endfor %}
-                        </td>
-
                         <!-- Permissions for each Layer -->
                         {% for department in departments %}
                         {% for layer in grouped_layers[department] %}

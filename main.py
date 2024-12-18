@@ -188,7 +188,11 @@ def all_layers():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
-    cursor.execute('SELECT * FROM layers')
+    # fetch all layers
+    cursor.execute('''
+                SELECT * FROM layers
+                ORDER BY name ASC
+                ''')
     rows = cursor.fetchall()
     conn.close()
 
@@ -349,7 +353,6 @@ def delete_user(user_id):
             conn.close()
             print("User deleted successfully!")
 
-
         except sqlite3.Error as e:
             print(f"An error occurred: {e}", "error")
 
@@ -359,12 +362,18 @@ def delete_user(user_id):
 @app.route('/users')
 @login_required
 def all_users():
+    sort_order = request.args.get('sort', 'asc')
+
     # connect to database
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
+    if sort_order == 'asc':
+        cursor.execute('SELECT * FROM users ORDER BY name ASC')
+    else:
+        cursor.execute('SELECT * FROM users ORDER BY name DESC')
+
     # fetch users
-    cursor.execute('SELECT * FROM users')
     users = cursor.fetchall()
 
     # fetch layers
@@ -404,7 +413,7 @@ def all_users():
     conn.close()
 
     return render_template('users.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
-                           departments=departments, total_column_spans=total_column_spans)
+                           departments=departments, total_column_spans=total_column_spans, sort_order=sort_order)
 
 
 @app.route('/database', methods=['GET'])
@@ -521,8 +530,8 @@ def add_department_group():
 
     else:
         return render_template('add_department_group.html', departments=departments, groups=groups,
-                           add_department_form=add_department_form,
-                           add_group_form=add_group_form)
+                               add_department_form=add_department_form,
+                               add_group_form=add_group_form)
 
 
 if __name__ == '__main__':
