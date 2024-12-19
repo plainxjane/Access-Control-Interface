@@ -84,13 +84,14 @@ def add_layer():
             ''', (name, department_string, group_string))
 
             conn.commit()
-            conn.close()
 
             print('Layer added successfully!')
             return redirect(url_for('all_layers'))
 
         except sqlite3.Error as e:
             print(f"An error: {e}")
+
+    conn.close()
 
     return render_template('add_layer.html', form=add_layer_form)
 
@@ -147,12 +148,13 @@ def update_layer(layer_id):
                         WHERE id = ?
                     ''', (updated_name, department_string, group_string, layer_id,))
             conn.commit()
-            conn.close()
 
             return redirect(url_for('all_layers'))
 
         except sqlite3.Error as e:
             print(f"An error occurred: {e}", "error")
+
+    conn.close()
 
     return render_template('update_layer.html', form=update_layer_form, layer_data=layer_data)
 
@@ -170,11 +172,12 @@ def delete_layer(layer_id):
                         DELETE FROM layers WHERE id = ?
                         ''', (layer_id,))
             conn.commit()
-            conn.close()
             print("Layer deleted successfully!")
 
         except sqlite3.Error as e:
             print(f"An error occurred: {e}", "error")
+
+    conn.close()
 
     return redirect(url_for('all_layers'))
 
@@ -258,7 +261,6 @@ def add_user():
                 name, department_string, group_string, editor_string, viewer_string, download_attachments_string))
 
             conn.commit()
-            conn.close()
 
             print('User added successfully!')
             return redirect(url_for('all_users'))
@@ -267,8 +269,9 @@ def add_user():
             print(f"An error: {e}")
             return render_template('add_user.html', form=add_user_form)
 
-    else:
-        return render_template('add_user.html', form=add_user_form)
+    conn.close()
+
+    return render_template('add_user.html', form=add_user_form)
 
 
 @app.route('/update_user/<int:user_id>', methods=['POST', 'GET'])
@@ -333,12 +336,13 @@ def update_user(user_id):
                 user_id))
 
             conn.commit()
-            conn.close()
 
             return redirect(url_for('all_users'))
 
         except sqlite3.Error as e:
             print(f"An error occurred: {e}", "error")
+
+    conn.close()
 
     return render_template('update_user.html', form=update_user_form, user_data=user_data, user_id=user_id)
 
@@ -356,11 +360,12 @@ def delete_user(user_id):
                             DELETE FROM users WHERE id = ?
                             ''', (user_id,))
             conn.commit()
-            conn.close()
             print("User deleted successfully!")
 
         except sqlite3.Error as e:
             print(f"An error occurred: {e}", "error")
+
+    conn.close()
 
     return redirect(url_for('all_users'))
 
