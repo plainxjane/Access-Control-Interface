@@ -62,7 +62,7 @@ def add_layer():
     cursor.execute('SELECT name FROM groups')
     groups = [row[0] for row in cursor.fetchall()]
 
-    # update form fields
+    # populate form fields
     add_layer_form.department.choices = [(dept, dept) for dept in departments]
     add_layer_form.groups.choices = [(grp, grp) for grp in groups]
 
@@ -91,8 +91,6 @@ def add_layer():
 
         except sqlite3.Error as e:
             print(f"An error: {e}")
-
-    conn.close()
 
     return render_template('add_layer.html', form=add_layer_form)
 
@@ -228,7 +226,7 @@ def add_user():
     cursor.execute('SELECT name FROM layers')
     layers = [row[0] for row in cursor.fetchall()]
 
-    # update form fields
+    # populate form with existing choices
     add_user_form.department.choices = [(dept, dept) for dept in departments]
     add_user_form.groups.choices = [(grp, grp) for grp in groups]
     add_user_form.editor.choices = [(layer, layer) for layer in layers]
@@ -305,7 +303,7 @@ def update_user(user_id):
                                       viewer=user_data[5].split(', '),
                                       download_attachments=user_data[6].split(', '))
 
-    # update form fields
+    # populate form fields
     update_user_form.department.choices = [(dept, dept) for dept in departments]
     update_user_form.groups.choices = [(grp, grp) for grp in groups]
     update_user_form.editor.choices = [(layer, layer) for layer in layers]
@@ -405,7 +403,7 @@ def all_users():
     }
     total_column_spans = sum(column_spans.values())
 
-    # split user fields before passing to template
+    # split user fields before passing into template
     split_users = []
     for user in users:
         split_users.append({
@@ -437,6 +435,7 @@ def database():
     # fetch relevant users based on search query
     if search_query:
         cursor.execute('SELECT * FROM users WHERE name LIKE ?', (f"%{search_query}%",))
+    # fetch all users if no search query
     else:
         cursor.execute('SELECT * FROM users')
     users = cursor.fetchall()
@@ -449,14 +448,14 @@ def database():
     cursor.execute('SELECT name FROM departments')
     departments = [dept[0] for dept in cursor.fetchall()]
 
-    # group layers under respective department
+    # group layers under their respective department
     grouped_layers = {dept: [] for dept in departments}
     for layer in layers:
         department = layer[1]
         if department in grouped_layers:
             grouped_layers[department].append(layer[0])
 
-    # calculate column spans dynamically
+    # calculate column spans under each department dynamically
     column_spans = {
         dept: max(len(grouped_layers.get(dept, [])), 1) for dept in departments
     }
@@ -484,18 +483,19 @@ def database():
 @app.route('/add_department_group', methods=['POST', 'GET'])
 @login_required
 def add_department_group():
-    # connect to SQLite database
+    # connect to sqlite database
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
-    # fetch departments
+    # fetch existing departments
     cursor.execute('SELECT * FROM departments')
     departments = cursor.fetchall()
 
-    # fetch groups
+    # fetch existing groups
     cursor.execute('SELECT * FROM groups')
     groups = cursor.fetchall()
 
+    # initialise add department/group forms
     add_department_form = AddDepartmentForm()
     add_group_form = AddGroupForm()
 

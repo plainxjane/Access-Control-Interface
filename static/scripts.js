@@ -10,7 +10,7 @@ dropdownMenu.forEach((menu) => {
     });
 });
 
-// Initialize Bootstrap popover function
+// Initialize Bootstrap Popover function
 document.addEventListener('DOMContentLoaded', function () {
     var popoverElements = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
     popoverElements.forEach(function (popoverElement) {
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Download table as Excel sheet
+// Download table as Excel Sheet
 document.getElementById('download_excel').addEventListener('click', function () {
     const table = document.getElementById('users-table');
     if (!table) {
@@ -87,7 +87,7 @@ document.getElementById('download_excel').addEventListener('click', function () 
     XLSX.writeFile(workbook, "users_table.xlsx");
 });
 
-// Search bar for users
+// Search Button
 document.getElementById('search-btn').addEventListener('click', function () {
         performSearch();
 });
