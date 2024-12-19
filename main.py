@@ -511,8 +511,6 @@ def add_department_group():
                             ''', (department_name,))
 
                 conn.commit()
-                conn.close()
-
                 return redirect(url_for('add_department_group'))
 
             except sqlite3.Error as e:
@@ -529,8 +527,6 @@ def add_department_group():
                             ''', (group_name,))
 
                 conn.commit()
-                conn.close()
-
                 return redirect(url_for('add_department_group'))
 
             except sqlite3.Error as e:
@@ -540,11 +536,12 @@ def add_department_group():
         elif 'delete_department' in request.form:
             department_id = request.form.get('delete_department')
 
-            # delete from Departments table in database
+            # delete from Departments table
             try:
                 cursor.execute('''
                         DELETE FROM departments WHERE id = ?
                         ''', (department_id, ))
+
                 conn.commit()
                 return redirect(url_for('add_department_group'))
 
@@ -555,11 +552,13 @@ def add_department_group():
         elif 'delete_group' in request.form:
             group_id = request.form.get('delete_group')
 
-            # delete from Groups table in database
+            # delete from Groups table
             try:
                 cursor.execute('''
                             DELETE FROM groups WHERE id = ?
                         ''', (group_id, ))
+
+                conn.commit()
                 return redirect(url_for('add_department_group'))
 
             except sqlite3.Error as e:
@@ -569,13 +568,6 @@ def add_department_group():
     return render_template('add_department_group.html', departments=departments, groups=groups,
                                add_department_form=add_department_form,
                                add_group_form=add_group_form)
-
-
-@app.route('/delete_department', methods=['POST', 'GET'])
-def delete_department():
-
-
-    return render_template('add_department_group.html')
 
 
 if __name__ == '__main__':
