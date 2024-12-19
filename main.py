@@ -500,7 +500,7 @@ def add_department_group():
     add_group_form = AddGroupForm()
 
     if request.method == 'POST':
-        # process the 'Add Department' form
+        # process the 'Add Department' request
         if add_department_form.validate_on_submit() and 'add_department' in request.form:
             department_name = add_department_form.name.data
 
@@ -518,7 +518,7 @@ def add_department_group():
             except sqlite3.Error as e:
                 print(f"An error has occurred: {e}")
 
-        # process the 'Add Group' form
+        # process the 'Add Group' request
         elif add_group_form.validate_on_submit() and 'add_group' in request.form:
             group_name = add_group_form.name.data
 
@@ -536,10 +536,46 @@ def add_department_group():
             except sqlite3.Error as e:
                 print(f"An error has occurred {e}")
 
-    else:
-        return render_template('add_department_group.html', departments=departments, groups=groups,
+        # process the 'Delete Department' request
+        elif 'delete_department' in request.form:
+            department_id = request.form.get('delete_department')
+
+            # delete from Departments table in database
+            try:
+                cursor.execute('''
+                        DELETE FROM departments WHERE id = ?
+                        ''', (department_id, ))
+                conn.commit()
+                return redirect(url_for('add_department_group'))
+
+            except sqlite3.Error as e:
+                print(f"An error has occurred: {e}")
+
+        # process the 'Delete Group' request
+        elif 'delete_group' in request.form:
+            group_id = request.form.get('delete_group')
+
+            # delete from Groups table in database
+            try:
+                cursor.execute('''
+                            DELETE FROM groups WHERE id = ?
+                        ''', (group_id, ))
+                return redirect(url_for('add_department_group'))
+
+            except sqlite3.Error as e:
+                print(f"An error has occurred: {e}")
+
+    conn.close()
+    return render_template('add_department_group.html', departments=departments, groups=groups,
                                add_department_form=add_department_form,
                                add_group_form=add_group_form)
+
+
+@app.route('/delete_department', methods=['POST', 'GET'])
+def delete_department():
+
+
+    return render_template('add_department_group.html')
 
 
 if __name__ == '__main__':

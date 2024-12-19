@@ -60,12 +60,19 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for department in departments %}
                         <tr>
                             <td>{{ department[1] }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('add_department_group') }}">
+                                    <input type="hidden" name="delete_department" value="{{ department[0] }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">X</button>
+                                </form>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -79,12 +86,19 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for group in groups %}
                         <tr>
                             <td>{{ group[1] }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('add_department_group') }}">
+                                    <input type="hidden" name="delete_group" value="{{ group[0] }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">X</button>
+                                </form>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
