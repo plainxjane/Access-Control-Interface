@@ -12,11 +12,11 @@
         <h1>All Layers</h1>
     </div>
 
-    <!-- Department Filter Select -->
+    <!-- Department Filter Dropdown -->
     <div class="row mt-4 justify-content-end">
         <form method="GET" action="{{ url_for('all_layers') }}" class="d-flex align-items-center mb-3">
             <div class="dropdown me-2">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-bs-toggle="dropdown" aria-expanded="false">
                     Filter by Departments
                 </button>
@@ -25,7 +25,7 @@
                     <li>
                         <label class="dropdown-item">
                             <input type="checkbox" name="departments[]" value="all"
-                                   {% if 'all' in selected_departments %} {% endif %}> All Departments
+                                   {% if 'all' in selected_departments %} {% endif %} class="form-check-input"> All Departments
                         </label>
                     </li>
                     <li>
@@ -36,7 +36,7 @@
                     <li>
                         <label class="dropdown-item">
                             <input type="checkbox" name="departments[]" value="{{ department }}"
-                                   {% if department in selected_departments %} {% endif %}> {{ department }}
+                                   {% if department in selected_departments %} {% endif %} class="form-check-input"> {{ department }}
                         </label>
                     </li>
                     {% endfor %}
@@ -44,7 +44,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary">Filter</button>
+            <button type="submit" class="btn btn-primary submit-btn">Filter</button>
         </form>
     </div>
 

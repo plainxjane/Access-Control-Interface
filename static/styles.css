@@ -21,7 +21,7 @@
     background-color: #182434;
 }
 
-#button1, #button2, #button3, #button4, #button5 {
+#button1, #button2, #button3, #button4, #button5, #dropdownMenuButton {
     color: black;
     background-color: transparent;
     border: 1px solid black;
@@ -120,3 +120,15 @@ table.table-bordered {
     background-color: #1e2d47;
     border: #1e2d47;
 }
+
+/* Change the color of the dropdown checkbox */
+.form-check-input:checked {
+    background-color: #1e2d47;
+    border-color: #1e2d47;
+}
+
+.dropdown-checkboxes input[type="checkbox"]:checked {
+    background-color: #1e2d47;
+    border-color: #1e2d47;
+}
+
