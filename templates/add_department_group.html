@@ -19,7 +19,7 @@
                             {{ add_department_form.hidden_tag() }}
                             <div class="mb-3">
                                 {{ add_department_form.name.label(class="form-label") }}
-                                {{ add_department_form.name(class="form-control", required=True) }}
+                                {{ add_department_form.name(class="form-control", required=True, autocomplete="off") }}
                             </div>
                             <button type="submit" name="add_department" class="btn w-100 text-white add-btn">
                                 Add Department
@@ -40,7 +40,7 @@
                             {{ add_group_form.hidden_tag() }}
                             <div class="mb-3">
                                 {{ add_group_form.name.label(class="form-label") }}
-                                {{ add_group_form.name(class="form-control", required=True) }}
+                                {{ add_group_form.name(class="form-control", required=True, autocomplete="off") }}
                             </div>
                             <button type="submit" name="add_group" class="btn w-100 text-white add-btn">
                                 Add Group
