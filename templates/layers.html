@@ -6,8 +6,13 @@
 
 <br><br><br>
 
-<!-- Department Filter Select -->
+<!-- Layer Information Table -->
 <div class="container-fluid px-4">
+    <div class="row me-auto mb-2 mb-lg-0">
+        <h1>All Layers</h1>
+    </div>
+
+    <!-- Department Filter Select -->
     <div class="row mt-4 justify-content-end">
         <form method="GET" action="{{ url_for('all_layers') }}" class="d-flex align-items-center mb-3">
             <div class="dropdown me-2">
@@ -19,7 +24,7 @@
                     <!-- "All Departments" Checkbox -->
                     <li>
                         <label class="dropdown-item">
-                            <input type="checkbox" name="department" value="all"
+                            <input type="checkbox" name="departments[]" value="all"
                                    {% if 'all' in selected_departments %}checked{% endif %}> All Departments
                         </label>
                     </li>
@@ -30,7 +35,7 @@
                     {% for department in departments %}
                     <li>
                         <label class="dropdown-item">
-                            <input type="checkbox" name="department" value="{{ department }}"
+                            <input type="checkbox" name="departments[]" value="{{ department }}"
                                    {% if department in selected_departments %}checked{% endif %}> {{ department }}
                         </label>
                     </li>
@@ -39,25 +44,17 @@
             </div>
 
             <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary">Filter</button>
+            <button type="submit" class="btn btn-primary">Filter</button>
         </form>
     </div>
-</div>
 
-<!-- Layer Information Table -->
-<div class="container-fluid px-4">
-    <div class="row me-auto mb-2 mb-lg-0">
-        <h1>All Layers</h1>
-    </div>
     <div class="row mt-4">
         <div class="col">
             <table class="table table-bordered" id="layers-table">
                 <thead>
                 <tr>
                     <th>Edit Layer</th>
-                    <th>
-                        Name
-                    </th>
+                    <th>Name</th>
                     <th>Department</th>
                     <th>Group</th>
                 </tr>

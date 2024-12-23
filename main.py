@@ -166,6 +166,7 @@ def delete_layer(layer_id):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
+    # delete selected layer
     if request.method == 'POST':
         try:
             cursor.execute('''
@@ -190,22 +191,26 @@ def all_layers():
     cursor = conn.cursor()
 
     # fetch all distinct departments
-    cursor.execute('SELECT name FROM departments')
+    cursor.execute('SELECT DISTINCT name FROM departments')
     departments = [row[0] for row in cursor.fetchall()]
 
     # get selected departments
-    selected_department = request.args.get('department', 'all')
+    selected_departments = request.args.getlist('departments[]')
 
-    # fetch layers filtered by selected departments
-    if selected_department and selected_department != 'all':
-        cursor.execute('SELECT * FROM layers WHERE department = ? ORDER BY name ASC', (selected_department, ))
+    # fetch layers based on selected departments
+    if 'all' in selected_departments or not selected_departments:
+        # if "All Departments' is selected or no filter is applied, fetch ALL layers
+        cursor.execute('SELECT * FROM layers')
     else:
-        cursor.execute('SELECT * FROM layers ORDER BY name ASC')
+        # if specific departments are selected, filter layers by those departments
+        placeholders = ', '.join('?' for _ in selected_departments)
+        query = f'SELECT * FROM layers WHERE department IN ({placeholders})'
+        cursor.execute(query, selected_departments)
 
     rows = cursor.fetchall()
     conn.close()
 
-    return render_template('layers.html', rows=rows, departments=departments, selected_department=selected_department)
+    return render_template('layers.html', rows=rows, departments=departments, selected_departments=selected_departments)
 
 
 @app.route('/add_user', methods=['POST', 'GET'])
@@ -354,6 +359,7 @@ def delete_user(user_id):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
+    # delete selected user
     if request.method == 'POST':
         try:
             cursor.execute('''
