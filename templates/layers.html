@@ -25,7 +25,7 @@
                     <li>
                         <label class="dropdown-item">
                             <input type="checkbox" name="departments[]" value="all"
-                                   {% if 'all' in selected_departments %}checked{% endif %}> All Departments
+                                   {% if 'all' in selected_departments %} {% endif %}> All Departments
                         </label>
                     </li>
                     <li>
@@ -36,7 +36,7 @@
                     <li>
                         <label class="dropdown-item">
                             <input type="checkbox" name="departments[]" value="{{ department }}"
-                                   {% if department in selected_departments %}checked{% endif %}> {{ department }}
+                                   {% if department in selected_departments %} {% endif %}> {{ department }}
                         </label>
                     </li>
                     {% endfor %}
