@@ -92,7 +92,6 @@ def add_layer():
             print(f"An error: {e}")
 
     conn.close()
-
     return render_template('add_layer.html', form=add_layer_form)
 
 
@@ -155,7 +154,6 @@ def update_layer(layer_id):
             print(f"An error occurred: {e}", "error")
 
     conn.close()
-
     return render_template('update_layer.html', form=update_layer_form, layer_data=layer_data)
 
 
@@ -179,7 +177,6 @@ def delete_layer(layer_id):
             print(f"An error occurred: {e}", "error")
 
     conn.close()
-
     return redirect(url_for('all_layers'))
 
 
@@ -200,16 +197,16 @@ def all_layers():
     # fetch layers based on selected departments
     if 'all' in selected_departments or not selected_departments:
         # if "All Departments' is selected or no filter is applied, fetch ALL layers
-        cursor.execute('SELECT * FROM layers')
+        cursor.execute('SELECT * FROM layers ORDER BY name ASC')
     else:
         # if specific departments are selected, filter layers by those departments
         placeholders = ', '.join('?' for _ in selected_departments)
-        query = f'SELECT * FROM layers WHERE department IN ({placeholders})'
+        query = f'SELECT * FROM layers WHERE department IN ({placeholders}) ORDER BY name ASC'
         cursor.execute(query, selected_departments)
 
     rows = cursor.fetchall()
-    conn.close()
 
+    conn.close()
     return render_template('layers.html', rows=rows, departments=departments, selected_departments=selected_departments)
 
 
@@ -275,7 +272,6 @@ def add_user():
             return render_template('add_user.html', form=add_user_form)
 
     conn.close()
-
     return render_template('add_user.html', form=add_user_form)
 
 
@@ -348,7 +344,6 @@ def update_user(user_id):
             print(f"An error occurred: {e}", "error")
 
     conn.close()
-
     return render_template('update_user.html', form=update_user_form, user_data=user_data, user_id=user_id)
 
 
@@ -372,7 +367,6 @@ def delete_user(user_id):
             print(f"An error occurred: {e}", "error")
 
     conn.close()
-
     return redirect(url_for('all_users'))
 
 
@@ -388,9 +382,9 @@ def all_users():
 
     # fetch relevant users based on search query
     if search_query:
-        cursor.execute('SELECT * FROM users WHERE name LIKE ?', (f"%{search_query}%",))
+        cursor.execute('SELECT * FROM users WHERE name LIKE ? ORDER BY name ASC', (f"%{search_query}%",))
     else:
-        cursor.execute('SELECT * FROM users')
+        cursor.execute('SELECT * FROM users ORDER BY name ASC')
     users = cursor.fetchall()
 
     # fetch layers
@@ -428,7 +422,6 @@ def all_users():
         })
 
     conn.close()
-
     return render_template('users.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
                            departments=departments, total_column_spans=total_column_spans, query=search_query)
 
@@ -486,7 +479,6 @@ def database():
         })
 
     conn.close()
-
     return render_template('database.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
                            departments=departments, total_column_spans=total_column_spans, query=search_query)
 
@@ -547,7 +539,7 @@ def add_department_group():
         elif 'delete_department' in request.form:
             department_id = request.form.get('delete_department')
 
-            # delete from Departments table
+            # delete from Departments table in SQLite database
             try:
                 cursor.execute('''
                         DELETE FROM departments WHERE id = ?
@@ -563,7 +555,7 @@ def add_department_group():
         elif 'delete_group' in request.form:
             group_id = request.form.get('delete_group')
 
-            # delete from Groups table
+            # delete from Groups table in SQLite database
             try:
                 cursor.execute('''
                             DELETE FROM groups WHERE id = ?

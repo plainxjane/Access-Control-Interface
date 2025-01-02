@@ -123,6 +123,7 @@ table.table-bordered {
     border-right: 2px solid black;
 }
 
+/* Add borders for leftmost/rightmost layers under each department */
 .leftmost-border {
     border-left: 2px solid black !important;
 }
