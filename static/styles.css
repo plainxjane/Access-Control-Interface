@@ -95,6 +95,10 @@ div.rotate-90 {
     vertical-align: middle;
 }
 
+#layers-header {
+    border-left: 2px solid black;
+}
+
 /* Adjust table border size & colors */
 table.table-bordered {
   border: 2px solid black; /* Adjust border size and color */

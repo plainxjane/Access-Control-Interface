@@ -87,7 +87,7 @@ document.getElementById('download_excel').addEventListener('click', function () 
     XLSX.writeFile(workbook, "users_table.xlsx");
 });
 
-// Search Button
+// Search Button Functionalities
 document.getElementById('search-btn').addEventListener('click', function () {
         performSearch();
 });
