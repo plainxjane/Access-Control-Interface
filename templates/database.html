@@ -47,10 +47,10 @@
                     </tr>
                     <tr>
                         <th style="width: 40px;"></th>
-                        <th style="width: 150px;">Name</th>
+                        <th style="width: 150px;" id="right-border-1">Name</th>
                         {% for department in departments %}
                         {% for layer in grouped_layers[department] %}
-                        <th class="rotate-90">
+                        <th class="rotate-90 {% if loop.first %}leftmost-border{% endif %} {% if loop.last %}rightmost-border{% endif %}">
                             <div class="rotate-90" style="rotate(">{{ layer }}</div>
                         </th>
                     {% endfor %}
@@ -72,11 +72,11 @@
                             </i>
                         </td>
                         <!-- Name -->
-                        <td>{{ user.name }}</td>
+                        <td id="right-border-2">{{ user.name }}</td>
                         <!-- Permissions for each Layer -->
                         {% for department in departments %}
                         {% for layer in grouped_layers[department] %}
-                        <td>
+                        <td class="{% if loop.first %}leftmost-border{% endif %} {% if loop.last %}rightmost-border{% endif %}">
                             {% set permissions= [] %}
 
                             {% if layer in user.editor %}

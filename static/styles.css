@@ -99,7 +99,7 @@ div.rotate-90 {
     border-left: 2px solid black;
 }
 
-/* Adjust table border size & colors */
+/* Adjust table borders' size & colors */
 table.table-bordered {
   border: 2px solid black; /* Adjust border size and color */
 }
@@ -117,6 +117,18 @@ table.table-bordered {
 
 #row_2 {
     border-bottom: 2px solid black;
+}
+
+#right-border-1, #right-border-2 {
+    border-right: 2px solid black;
+}
+
+.leftmost-border {
+    border-left: 2px solid black !important;
+}
+
+.rightmost-border {
+    border-right: 2px solid black !important;
 }
 
 /* Adjust search bar's icon color */
