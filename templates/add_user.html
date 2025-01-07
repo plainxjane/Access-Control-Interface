@@ -174,43 +174,6 @@
         </div>
         <br>
 
-        <!-- Download Attachments Input -->
-        <div class="row mb-3">
-            <div class="col-6">
-                {{ form.download_attachments.label }}
-
-                <!-- Custom Dropdown Select -->
-                <div class="dropdown">
-                    <!-- Dropdown Toggle Button -->
-                    <button
-                            class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
-                            type="button"
-                            id="button5"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                        Select 'Download Attachments' layers
-                        <span class="dropdown-icon"></span>
-                    </button>
-
-                    <!-- Dropdown Menu with Checkboxes -->
-                    <div class="dropdown-menu p-3 w-100">
-                        {% for subfield in form.download_attachments %}
-                        <div class="form-check">
-                            <!-- Render Checkbox -->
-                            {{ subfield(**{'class': 'form-check-input'}) }}
-
-                            <!-- Checkbox Label -->
-                            <label class="form-check-label" for="{{ subfield.id }}">
-                                {{ subfield.label.text }}
-                            </label>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br>
-
         <!-- Submit Button -->
         <div class="row mb-3">
             <div class="col-6">

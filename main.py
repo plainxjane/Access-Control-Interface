@@ -236,7 +236,6 @@ def add_user():
     add_user_form.groups.choices = [(grp, grp) for grp in groups]
     add_user_form.editor.choices = [(layer, layer) for layer in layers]
     add_user_form.viewer.choices = [(layer, layer) for layer in layers]
-    add_user_form.download_attachments.choices = [(layer, layer) for layer in layers]
 
     # process form submission
     if request.method == 'POST' and add_user_form.validate_on_submit():
@@ -245,22 +244,20 @@ def add_user():
         groups = add_user_form.groups.data
         editor = add_user_form.editor.data
         viewer = add_user_form.viewer.data
-        download_attachments = add_user_form.download_attachments.data
 
         # convert lists into comma-separated strings
         department_string = ', '.join(departments)
         group_string = ', '.join(groups)
         editor_string = ', '.join(editor)
         viewer_string = ', '.join(viewer)
-        download_attachments_string = ', '.join(download_attachments)
 
         # insert into SQLite database
         try:
             cursor.execute('''
-                    INSERT INTO users (name, department, groups, editor, viewer, download_attachments)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO users (name, department, groups, editor, viewer)
+                    VALUES (?, ?, ?, ?, ?)
                     ''', (
-                name, department_string, group_string, editor_string, viewer_string, download_attachments_string))
+                name, department_string, group_string, editor_string, viewer_string))
 
             conn.commit()
 
@@ -304,15 +301,13 @@ def update_user(user_id):
     # initialize the update user form
     update_user_form = UpdateUserForm(name=user_data[1], department=user_data[2].split(', '),
                                       groups=user_data[3].split(', '), editor=user_data[4].split(', '),
-                                      viewer=user_data[5].split(', '),
-                                      download_attachments=user_data[6].split(', '))
+                                      viewer=user_data[5].split(', '))
 
     # populate form fields
     update_user_form.department.choices = [(dept, dept) for dept in departments]
     update_user_form.groups.choices = [(grp, grp) for grp in groups]
     update_user_form.editor.choices = [(layer, layer) for layer in layers]
     update_user_form.viewer.choices = [(layer, layer) for layer in layers]
-    update_user_form.download_attachments.choices = [(layer, layer) for layer in layers]
 
     # process form submission
     if request.method == 'POST' and update_user_form.validate_on_submit():
@@ -321,7 +316,6 @@ def update_user(user_id):
         updated_groups = ', '.join(update_user_form.groups.data)
         updated_editor = ', '.join(update_user_form.editor.data)
         updated_viewer = ', '.join(update_user_form.viewer.data)
-        updated_download_attachments = ', '.join(update_user_form.download_attachments.data)
 
         # update SQLite database
         try:
@@ -329,11 +323,10 @@ def update_user(user_id):
             cursor = conn.cursor()
             cursor.execute('''
             UPDATE users
-            SET name = ?, department = ?, groups = ?, editor = ?, viewer = ?, download_attachments = ?
+            SET name = ?, department = ?, groups = ?, editor = ?, viewer = ?
             WHERE id = ?
             ''', (
                 updated_name, updated_department, updated_groups, updated_editor, updated_viewer,
-                updated_download_attachments,
                 user_id))
 
             conn.commit()
@@ -417,12 +410,35 @@ def all_users():
             'groups': user[3].split(', '),
             'editor': user[4].split(', '),
             'viewer': user[5].split(', '),
-            'download_attachments': user[6].split(', '),
         })
 
     conn.close()
     return render_template('users.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
                            departments=departments, total_column_spans=total_column_spans, query=search_query)
+
+
+@app.route('/add_dashboard', methods=['POST', 'GET'])
+@login_required
+def add_dashboard():
+    pass
+
+
+@app.route('/update_dashboard', methods=['POST', 'GET'])
+@login_required
+def update_dashboard():
+    pass
+
+
+@app.route('/delete_dashboard', methods=['POST'])
+@login_required
+def delete_dashboard():
+    pass
+
+
+@app.route('/dashboards')
+@login_required
+def all_dashboards():
+    pass
 
 
 @app.route('/database', methods=['GET'])
@@ -474,7 +490,6 @@ def database():
             'groups': user[3].split(', '),
             'editor': user[4].split(', '),
             'viewer': user[5].split(', '),
-            'download_attachments': user[6].split(', '),
         })
 
     conn.close()

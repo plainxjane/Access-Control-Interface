@@ -79,9 +79,6 @@ class AddUserForm(FlaskForm):
     viewer = SelectMultipleField('Viewer', choices=layers, coerce=str,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
-    download_attachments = SelectMultipleField('Download Attachments', choices=layers, coerce=str,
-                                               widget=ListWidget(prefix_label=False),
-                                               option_widget=CheckboxInput(), )
     submit = SubmitField('Submit')
 
 
@@ -104,9 +101,6 @@ class UpdateUserForm(FlaskForm):
     viewer = SelectMultipleField('Viewer', choices=layers, coerce=str,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
-    download_attachments = SelectMultipleField('Download Attachments', choices=layers, coerce=str,
-                                               widget=ListWidget(prefix_label=False),
-                                               option_widget=CheckboxInput(), )
     submit = SubmitField('Submit')
 
 
