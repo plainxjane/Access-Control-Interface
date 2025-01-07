@@ -41,9 +41,9 @@
 }
 
 .table-header-rotated th.rotate-90 {
-  height: 200px;
+  height: auto;
   width: auto;
-  min-width: 20px;
+  min-width: 10px;
   position: relative;
   vertical-align: middle;
   font-size: 14px;
@@ -53,6 +53,7 @@
   word-wrap: normal;
 }
 
+
 /* Rotated text for layer name */
 .table-header-rotated th.rotate-90 div.rotate-90 {
     position: relative;
@@ -60,7 +61,7 @@
     transform: rotate(-90deg);
     transform-origin: center center;
     width: 100%;
-    height: auto;
+    height: 100%;
     word-wrap: break-word;
     white-space: normal;
     overflow-wrap: break-word;
