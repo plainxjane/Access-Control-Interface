@@ -337,7 +337,6 @@ def update_user(user_id):
                 user_id))
 
             conn.commit()
-
             return redirect(url_for('all_users'))
 
         except sqlite3.Error as e:
