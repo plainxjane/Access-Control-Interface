@@ -68,6 +68,7 @@
   text-align: center;
   line-height: 1.2; /* Adjust line height for better spacing */
   padding: 2px; /* Add some padding to prevent clipping */
+  font-size: 15px;
 }
 
 /* Responsive table wrappers */
@@ -77,8 +78,7 @@
 
 /* Change department name text color to red */
 #department_name {
-    color: red;
-    border: 2px solid red;
+    border: 2px solid black;
     vertical-align: middle;
 }
 
@@ -135,4 +135,3 @@ table.table-bordered {
     background-color: #1e2d47;
     border-color: #1e2d47;
 }
-

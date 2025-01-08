@@ -1,4 +1,4 @@
-from flask import Flask, g, flash, request, redirect, render_template, url_for, session
+from flask import Flask, g, flash, request, redirect, render_template, url_for, session, jsonify
 from models.Forms import LoginForm, AddLayerForm, UpdateLayerForm, AddUserForm, UpdateUserForm, AddDepartmentForm, \
     AddGroupForm
 from wrappers import login_required
@@ -227,15 +227,22 @@ def add_user():
     cursor.execute('SELECT name FROM groups')
     groups = [row[0] for row in cursor.fetchall()]
 
-    # fetch layers
-    cursor.execute('SELECT name FROM layers')
-    layers = [row[0] for row in cursor.fetchall()]
+    # fetch layers & group them by department
+    cursor.execute('SELECT name, department FROM layers')
+    layers_by_department = {}
+    for layer_name, department in cursor.fetchall():
+        if department not in layers_by_department:
+            layers_by_department[department] = []
+        layers_by_department[department].append(layer_name)
+
+    # flatten all layers
+    all_layers = [layer for layers in layers_by_department.values() for layer in layers]
 
     # populate form with existing choices
     add_user_form.department.choices = [(dept, dept) for dept in departments]
     add_user_form.groups.choices = [(grp, grp) for grp in groups]
-    add_user_form.editor.choices = [(layer, layer) for layer in layers]
-    add_user_form.viewer.choices = [(layer, layer) for layer in layers]
+    add_user_form.editor.choices = [(layer, layer) for layer in all_layers]
+    add_user_form.viewer.choices = [(layer, layer) for layer in all_layers]
 
     # process form submission
     if request.method == 'POST' and add_user_form.validate_on_submit():
@@ -245,6 +252,19 @@ def add_user():
         editor = add_user_form.editor.data
         viewer = add_user_form.viewer.data
 
+        # check if user belongs to the 'IDE - General Viewers' group
+        if 'IDE - General Viewers' in groups:
+            # if so, assign all layers to viewer field
+            viewer = all_layers
+
+        # if departments are selected, assign layers to both viewer & editor based on those departments
+        selected_layers = set()
+        for dept in departments:
+            selected_layers.update(layers_by_department.get(dept, []))
+
+        editor.extend(selected_layers)
+        viewer.extend(selected_layers)
+
         # convert lists into comma-separated strings
         department_string = ', '.join(departments)
         group_string = ', '.join(groups)
@@ -253,6 +273,7 @@ def add_user():
 
         # insert into SQLite database
         try:
+            # insert new user into users table
             cursor.execute('''
                     INSERT INTO users (name, department, groups, editor, viewer)
                     VALUES (?, ?, ?, ?, ?)
@@ -269,7 +290,7 @@ def add_user():
             return render_template('add_user.html', form=add_user_form)
 
     conn.close()
-    return render_template('add_user.html', form=add_user_form)
+    return render_template('add_user.html', form=add_user_form, layers_by_department=layers_by_department)
 
 
 @app.route('/update_user/<int:user_id>', methods=['POST', 'GET'])
@@ -294,9 +315,16 @@ def update_user(user_id):
     cursor.execute('SELECT name FROM groups')
     groups = [row[0] for row in cursor.fetchall()]
 
-    # fetch layers
-    cursor.execute('SELECT name FROM layers')
-    layers = [row[0] for row in cursor.fetchall()]
+    # fetch layers & group them by department
+    cursor.execute('SELECT name, department FROM layers')
+    layers_by_department = {}
+    for layer_name, department in cursor.fetchall():
+        if department not in layers_by_department:
+            layers_by_department[department] = []
+        layers_by_department[department].append(layer_name)
+
+    # flatten all layers
+    all_layers = [layer for layers in layers_by_department.values() for layer in layers]
 
     # initialize the update user form
     update_user_form = UpdateUserForm(name=user_data[1], department=user_data[2].split(', '),
@@ -306,16 +334,57 @@ def update_user(user_id):
     # populate form fields
     update_user_form.department.choices = [(dept, dept) for dept in departments]
     update_user_form.groups.choices = [(grp, grp) for grp in groups]
-    update_user_form.editor.choices = [(layer, layer) for layer in layers]
-    update_user_form.viewer.choices = [(layer, layer) for layer in layers]
+    update_user_form.editor.choices = [(layer, layer) for layer in all_layers]
+    update_user_form.viewer.choices = [(layer, layer) for layer in all_layers]
 
     # process form submission
     if request.method == 'POST' and update_user_form.validate_on_submit():
         updated_name = update_user_form.name.data
-        updated_department = ', '.join(update_user_form.department.data)
-        updated_groups = ', '.join(update_user_form.groups.data)
-        updated_editor = ', '.join(update_user_form.editor.data)
-        updated_viewer = ', '.join(update_user_form.viewer.data)
+        updated_department = update_user_form.department.data
+        updated_groups = update_user_form.groups.data
+
+        # fetch current departments from the database
+        current_departments = user_data[2].split(', ')
+
+        print(updated_groups)
+
+        # check if user is in 'ide - general viewers' group
+        is_in_general_viewers = 'IDE - General Viewers' in updated_groups
+
+        # determine layers to remove (layers from previous departments not in the new departments)
+        layers_to_remove = set()
+        if not is_in_general_viewers:
+            for dept in current_departments:
+                if dept not in updated_department:
+                    layers_to_remove.update(layers_by_department.get(dept, []))
+
+        # determine layers to add (layers from new departments not in the old departments)
+        layers_to_add = set()
+        for dept in updated_department:
+            if dept not in current_departments:
+                layers_to_add.update(layers_by_department.get(dept, []))
+
+        # Fetch current editor and viewer layers
+        current_editor_layers = set(user_data[4].split(', '))
+        current_viewer_layers = set(user_data[5].split(', '))
+
+        # Update editor layers
+        updated_editor_layers = (current_editor_layers - layers_to_remove).union(layers_to_add)
+
+        # update viewer layers
+        if is_in_general_viewers:
+            updated_viewer_layers = set(all_layers)
+        else:
+            updated_viewer_layers = (current_viewer_layers - layers_to_remove).union(layers_to_add)
+
+        print(updated_editor_layers)
+        print(updated_viewer_layers)
+
+        # Convert to comma-separated strings for database storage
+        updated_editor = ', '.join(updated_editor_layers)
+        updated_viewer = ', '.join(updated_viewer_layers)
+        updated_department = ', '.join(updated_department)
+        updated_group = ', '.join(updated_groups)
 
         # update SQLite database
         try:
@@ -326,7 +395,7 @@ def update_user(user_id):
             SET name = ?, department = ?, groups = ?, editor = ?, viewer = ?
             WHERE id = ?
             ''', (
-                updated_name, updated_department, updated_groups, updated_editor, updated_viewer,
+                updated_name, updated_department, updated_group, updated_editor, updated_viewer,
                 user_id))
 
             conn.commit()
@@ -460,7 +529,7 @@ def database():
     users = cursor.fetchall()
 
     # fetch all layers
-    cursor.execute('SELECT name, department FROM layers')
+    cursor.execute('SELECT name, department, groups FROM layers')
     layers = cursor.fetchall()
 
     # fetch all departments
@@ -493,7 +562,8 @@ def database():
         })
 
     conn.close()
-    return render_template('database.html', users=split_users, layers=layers, grouped_layers=grouped_layers,
+    return render_template('database.html', users=split_users, layers=layers,
+                           grouped_layers=grouped_layers,
                            departments=departments, total_column_spans=total_column_spans, query=search_query)
 
 

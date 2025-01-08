@@ -86,9 +86,6 @@
                             {% if layer in user.viewer %}
                             {% set permissions = permissions + ['V'] %}
                             {% endif %}
-                            {% if layer in user.download_attachments %}
-                            {% set permissions = permissions + ['D'] %}
-                            {% endif %}
 
                             {% if permissions %}
                             {{ permissions | join(' + ') }}
@@ -120,5 +117,6 @@
         </div>
     </div>
 </div>
+
 
 {% endblock %}

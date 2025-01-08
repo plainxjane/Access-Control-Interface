@@ -105,3 +105,4 @@ function performSearch() {
     // Redirect to the same page with the search query as a parameter
     window.location.href = `/database?query=${encodeURIComponent(query)}`;
 }
+
