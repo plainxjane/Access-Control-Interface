@@ -327,8 +327,10 @@ def update_user(user_id):
     all_layers = [layer for layers in layers_by_department.values() for layer in layers]
 
     # initialize the update user form
-    update_user_form = UpdateUserForm(name=user_data[1], department=user_data[2].split(', '),
-                                      groups=user_data[3].split(', '), editor=user_data[4].split(', '),
+    update_user_form = UpdateUserForm(name=user_data[1],
+                                      department=user_data[2].split(', '),
+                                      groups=user_data[3].split(', '),
+                                      editor=user_data[4].split(', '),
                                       viewer=user_data[5].split(', '))
 
     # populate form fields
@@ -377,8 +379,14 @@ def update_user(user_id):
         else:
             updated_viewer_layers = (current_viewer_layers - layers_to_remove).union(layers_to_add)
 
-        print(updated_editor_layers)
-        print(updated_viewer_layers)
+        # ensure department-specific layers are E + V
+        department_layers = set()
+        for dept in updated_department:
+            department_layers.update(layers_by_department.get(dept, []))
+
+        # add department layers to both editor & viewer
+        updated_editor_layers.update(department_layers)
+        updated_viewer_layers.update(department_layers)
 
         # Convert to comma-separated strings for database storage
         updated_editor = ', '.join(updated_editor_layers)
