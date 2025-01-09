@@ -327,11 +327,12 @@ def update_user(user_id):
     all_layers = [layer for layers in layers_by_department.values() for layer in layers]
 
     # initialize the update user form
-    update_user_form = UpdateUserForm(name=user_data[1],
-                                      department=user_data[2].split(', '),
-                                      groups=user_data[3].split(', '),
-                                      editor=user_data[4].split(', '),
-                                      viewer=user_data[5].split(', '))
+    update_user_form = UpdateUserForm(
+                        name=user_data[1],
+                        department=user_data[2].split(', '),
+                        groups=user_data[3].split(', '),
+                        editor=user_data[4].split(', '),
+                        viewer=user_data[5].split(', '))
 
     # populate form fields
     update_user_form.department.choices = [(dept, dept) for dept in departments]
@@ -344,11 +345,11 @@ def update_user(user_id):
         updated_name = update_user_form.name.data
         updated_department = update_user_form.department.data
         updated_groups = update_user_form.groups.data
+        explicit_editor_layers = set(update_user_form.editor.data)
+        explicit_viewer_layers = set(update_user_form.viewer.data)
 
         # fetch current departments from the database
         current_departments = user_data[2].split(', ')
-
-        print(updated_groups)
 
         # check if user is in 'ide - general viewers' group
         is_in_general_viewers = 'IDE - General Viewers' in updated_groups
@@ -387,6 +388,10 @@ def update_user(user_id):
         # add department layers to both editor & viewer
         updated_editor_layers.update(department_layers)
         updated_viewer_layers.update(department_layers)
+
+        # respect explicit selections
+        updated_editor_layers.update(explicit_editor_layers)
+        updated_viewer_layers.update(explicit_viewer_layers)
 
         # Convert to comma-separated strings for database storage
         updated_editor = ', '.join(updated_editor_layers)
