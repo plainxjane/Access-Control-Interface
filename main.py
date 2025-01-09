@@ -292,7 +292,6 @@ def add_user():
     conn.close()
     return render_template('add_user.html', form=add_user_form, layers_by_department=layers_by_department)
 
-
 @app.route('/update_user/<int:user_id>', methods=['POST', 'GET'])
 @login_required
 def update_user(user_id):
@@ -419,7 +418,6 @@ def update_user(user_id):
 
     conn.close()
     return render_template('update_user.html', form=update_user_form, user_data=user_data, user_id=user_id)
-
 
 @app.route('/delete_user/<int:user_id>', methods=['POST'])
 @login_required
