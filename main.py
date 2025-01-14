@@ -366,9 +366,15 @@ def update_user(user_id):
         updated_editor_layers = set()
         updated_viewer_layers = set()
 
+        # Debug: Print the user_groups
+        print(f"User Groups: {updated_groups}")
+
         for layer_name, layer_groups in layers:
             layer_groups_set = set(group.strip() for group in layer_groups.split(', '))  # Strip spaces
             overlap = updated_groups.intersection(layer_groups_set)
+
+            # Print the overlap for this layer
+            print(f"Layer: {layer_name} | Layer Groups: {layer_groups_set} | Overlap: {overlap}")
 
             # Permissions logic
             if overlap:
