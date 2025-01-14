@@ -328,16 +328,17 @@ def update_user(user_id):
     cursor.execute('SELECT name FROM groups')
     groups = [row[0] for row in cursor.fetchall()]
 
-    # fetch layers & group them by department
-    cursor.execute('SELECT name, department FROM layers')
-    layers_by_department = {}
-    for layer_name, department in cursor.fetchall():
-        if department not in layers_by_department:
-            layers_by_department[department] = []
-        layers_by_department[department].append(layer_name)
+    # fetch layers & group them by groups
+    cursor.execute('SELECT name, groups FROM layers')
+    layers = cursor.fetchall()
+    layers_by_group = {}
+    for layer_name, group in layers:
+        if group not in layers_by_group:
+            layers_by_group[group] = []
+        layers_by_group[group].append(layer_name)
 
-    # flatten all layers
-    all_layers = [layer for layers in layers_by_department.values() for layer in layers]
+    # Flatten all layers
+    all_layers = [layer for layers in layers_by_group.values() for layer in layers]
 
     # initialize the update user form
     update_user_form = UpdateUserForm(
@@ -357,54 +358,25 @@ def update_user(user_id):
     if request.method == 'POST' and update_user_form.validate_on_submit():
         updated_name = update_user_form.name.data
         updated_department = update_user_form.department.data
-        updated_groups = update_user_form.groups.data
+        updated_groups = set(update_user_form.groups.data)
         explicit_editor_layers = set(update_user_form.editor.data)
         explicit_viewer_layers = set(update_user_form.viewer.data)
 
-        # fetch current departments from the database
-        current_departments = user_data[2].split(', ')
+        # update permissions dynamically
+        updated_editor_layers = set()
+        updated_viewer_layers = set()
 
-        # check if user is in 'ide - general viewers' group
-        is_in_general_viewers = 'IDE - General Viewers' in updated_groups
+        for layer_name, layer_groups in layers:
+            layer_groups_set = set(group.strip() for group in layer_groups.split(', '))  # Strip spaces
+            overlap = updated_groups.intersection(layer_groups_set)
 
-        # determine layers to remove (layers from previous departments not in the new departments)
-        layers_to_remove = set()
-        if not is_in_general_viewers:
-            for dept in current_departments:
-                if dept not in updated_department:
-                    layers_to_remove.update(layers_by_department.get(dept, []))
-
-        # determine layers to add (layers from new departments not in the old departments)
-        layers_to_add = set()
-        for dept in updated_department:
-            if dept not in current_departments:
-                layers_to_add.update(layers_by_department.get(dept, []))
-
-        # Fetch current editor and viewer layers
-        current_editor_layers = set(user_data[4].split(', '))
-        current_viewer_layers = set(user_data[5].split(', '))
-
-        # Update editor layers
-        updated_editor_layers = (current_editor_layers - layers_to_remove).union(layers_to_add)
-
-        # update viewer layers
-        if is_in_general_viewers:
-            updated_viewer_layers = set(all_layers)
-        else:
-            updated_viewer_layers = (current_viewer_layers - layers_to_remove).union(layers_to_add)
-
-        # ensure department-specific layers are E + V
-        department_layers = set()
-        for dept in updated_department:
-            department_layers.update(layers_by_department.get(dept, []))
-
-        # add department layers to both editor & viewer
-        updated_editor_layers.update(department_layers)
-        updated_viewer_layers.update(department_layers)
-
-        # respect explicit selections
-        updated_editor_layers.update(explicit_editor_layers)
-        updated_viewer_layers.update(explicit_viewer_layers)
+            # Permissions logic
+            if overlap:
+                if overlap == {'IDE - General Viewers'}:
+                    updated_viewer_layers.add(layer_name)  # Add to viewer list
+                elif len(overlap) > 1 or not {'IDE - General Viewers'}.issubset(overlap):
+                    updated_editor_layers.add(layer_name)  # Add to editor list
+                    updated_viewer_layers.add(layer_name)
 
         # Convert to comma-separated strings for database storage
         updated_editor = ', '.join(updated_editor_layers)
