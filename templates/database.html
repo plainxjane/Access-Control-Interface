@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %} Table {% endblock %}
+{% block title %} Matrix {% endblock %}
 
 {% block content %}
 
@@ -29,7 +29,7 @@
 <!-- User Table -->
 <div class="container-fluid px-4">
     <div class="row me-auto mb-2 mb-lg-0">
-        <h1>Database</h1>
+        <h1>Access Control Matrix</h1>
     </div>
     <div class="row mt-4>">
         <div class="col">
@@ -45,7 +45,7 @@
                         <th colspan="{{ grouped_layers[department] | length or 1 }}" class="text-center" id="department_name">{{ department }}</th>
                         {% endfor %}
                     </tr>
-                    <tr>
+                    <tr class="sticky-row">
                         <th style="width: 40px;"></th>
                         <th style="width: 150px;" id="right-border-1">Name</th>
                         {% for department in departments %}
@@ -120,13 +120,14 @@
 
 <!-- Legend -->
 <div class="container-fluid px-4" style="text-align: left;">
-    <p style="margin: 0; font-weight: bold;">Legend</p>
+    <p style="margin: 0; font-weight: bold;">Legend:</p>
     <div class="border p-2 w-auto" style="max-width: 200px;">
         <p style="margin: 0;"><b>NV</b>: Non-Viewable</p>
         <p style="margin: 0;"><b>V</b>: Viewable</p>
         <p style="margin: 0;"><b>E</b>: Editable</p>
     </div>
 </div>
+<br>
 
 
 {% endblock %}

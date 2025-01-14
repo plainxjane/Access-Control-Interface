@@ -227,16 +227,20 @@ def add_user():
     cursor.execute('SELECT name FROM groups')
     groups = [row[0] for row in cursor.fetchall()]
 
-    # fetch layers & group them by department
-    cursor.execute('SELECT name, department FROM layers')
-    layers_by_department = {}
-    for layer_name, department in cursor.fetchall():
-        if department not in layers_by_department:
-            layers_by_department[department] = []
-        layers_by_department[department].append(layer_name)
+    # fetch layers
+    cursor.execute('SELECT name, groups FROM layers')
+    layers = cursor.fetchall()
 
-    # flatten all layers
-    all_layers = [layer for layers in layers_by_department.values() for layer in layers]
+    # fetch layers & group them by groups
+    cursor.execute('SELECT name, groups FROM layers')
+    layers_by_group = {}
+    for layer_name, group in cursor.fetchall():
+        if group not in layers_by_group:
+            layers_by_group[group] = []
+        layers_by_group[group].append(layer_name)
+
+    # Flatten all layers
+    all_layers = [layer for layers in layers_by_group.values() for layer in layers]
 
     # populate form with existing choices
     add_user_form.department.choices = [(dept, dept) for dept in departments]
@@ -248,26 +252,35 @@ def add_user():
     if request.method == 'POST' and add_user_form.validate_on_submit():
         name = add_user_form.name.data
         departments = add_user_form.department.data
-        groups = add_user_form.groups.data
-        editor = add_user_form.editor.data
-        viewer = add_user_form.viewer.data
+        user_groups = set(add_user_form.groups.data)
 
-        # check if user belongs to the 'IDE - General Viewers' group
-        if 'IDE - General Viewers' in groups:
-            # if so, assign all layers to viewer field
-            viewer = all_layers
+        # initialize permissions for layers
+        editor = []
+        viewer = []
 
-        # if departments are selected, assign layers to both viewer & editor based on those departments
-        selected_layers = set()
-        for dept in departments:
-            selected_layers.update(layers_by_department.get(dept, []))
+        # Debug: Print the user_groups
+        print(f"User Groups: {user_groups}")
 
-        editor.extend(selected_layers)
-        viewer.extend(selected_layers)
+        # Calculate and print the overlap between user's groups and each layer's groups
+        for layer_name, layer_groups in layers:
+            # Convert the layer groups to a set for comparison
+            layer_groups_set = set(group.strip() for group in layer_groups.split(', '))  # Remove leading/trailing spaces
+            overlap = user_groups.intersection(layer_groups_set)
+
+            # Print the overlap for this layer
+            print(f"Layer: {layer_name} | Layer Groups: {layer_groups_set} | Overlap: {overlap}")
+
+            # handle permissions logic here
+            if overlap:
+                if len(overlap) == 1 and 'IDE - General Viewers' in overlap:
+                    viewer.append(layer_name)
+                elif len(overlap) > 1 or not {'IDE - General Viewers'}.issubset(overlap):
+                    editor.append(layer_name)
+                    viewer.append(layer_name)
 
         # convert lists into comma-separated strings
         department_string = ', '.join(departments)
-        group_string = ', '.join(groups)
+        group_string = ', '.join(user_groups)
         editor_string = ', '.join(editor)
         viewer_string = ', '.join(viewer)
 
@@ -290,7 +303,8 @@ def add_user():
             return render_template('add_user.html', form=add_user_form)
 
     conn.close()
-    return render_template('add_user.html', form=add_user_form, layers_by_department=layers_by_department)
+    return render_template('add_user.html', form=add_user_form, layers_by_group=layers_by_group)
+
 
 @app.route('/update_user/<int:user_id>', methods=['POST', 'GET'])
 @login_required
@@ -327,11 +341,11 @@ def update_user(user_id):
 
     # initialize the update user form
     update_user_form = UpdateUserForm(
-                        name=user_data[1],
-                        department=user_data[2].split(', '),
-                        groups=user_data[3].split(', '),
-                        editor=user_data[4].split(', '),
-                        viewer=user_data[5].split(', '))
+        name=user_data[1],
+        department=user_data[2].split(', '),
+        groups=user_data[3].split(', '),
+        editor=user_data[4].split(', '),
+        viewer=user_data[5].split(', '))
 
     # populate form fields
     update_user_form.department.choices = [(dept, dept) for dept in departments]
@@ -418,6 +432,7 @@ def update_user(user_id):
 
     conn.close()
     return render_template('update_user.html', form=update_user_form, user_data=user_data, user_id=user_id)
+
 
 @app.route('/delete_user/<int:user_id>', methods=['POST'])
 @login_required
@@ -638,7 +653,7 @@ def add_department_group():
             try:
                 cursor.execute('''
                         DELETE FROM departments WHERE id = ?
-                        ''', (department_id, ))
+                        ''', (department_id,))
 
                 conn.commit()
                 return redirect(url_for('add_department_group'))
@@ -654,7 +669,7 @@ def add_department_group():
             try:
                 cursor.execute('''
                             DELETE FROM groups WHERE id = ?
-                        ''', (group_id, ))
+                        ''', (group_id,))
 
                 conn.commit()
                 return redirect(url_for('add_department_group'))
@@ -664,8 +679,8 @@ def add_department_group():
 
     conn.close()
     return render_template('add_department_group.html', departments=departments, groups=groups,
-                               add_department_form=add_department_form,
-                               add_group_form=add_group_form)
+                           add_department_form=add_department_form,
+                           add_group_form=add_group_form)
 
 
 if __name__ == '__main__':
