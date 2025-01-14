@@ -40,6 +40,15 @@ def init_db():
     )
     ''')
 
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS dashboards (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL,
+        department TEXT NOT NULL,
+        groups TEXT NOT NULL
+    )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -70,34 +79,6 @@ def init_db():
 #     conn.commit()
 #     conn.close()
 
-
-# populate layers for testing
-def populate_layers():
-    # connect to sqlite database
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-
-    # define division & group
-    department = 'Architecture'
-    group = 'Editors_ARCH'
-
-    # Insert 20 layers under the specified department
-    try:
-        for i in range(1, 21):  # Loop to create 20 layers
-            layer_name = f"Layer_{i}"
-            cursor.execute('''
-                    INSERT INTO layers (name, department, groups) 
-                    VALUES (?, ?, ?)
-                ''', (layer_name, department, group))
-
-        # Commit the changes for layers
-        conn.commit()
-        print("Successfully added 20 layers under 'Architecture' department.")
-    except sqlite3.Error as e:
-        print(f"An error occurred while adding layers: {e}")
-    finally:
-        # Close the database connection
-        conn.close()
 
 if __name__=='__main__':
     init_db()
