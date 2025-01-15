@@ -602,10 +602,27 @@ def update_dashboard(dashboard_id):
     return render_template('update_dashboard.html', form=update_dashboard_form, dashboard_data=dashboard_data)
 
 
-@app.route('/delete_dashboard', methods=['POST'])
+@app.route('/delete_dashboard/<int:dashboard_id>', methods=['POST', 'GET'])
 @login_required
-def delete_dashboard():
-    pass
+def delete_dashboard(dashboard_id):
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # delete selected layer
+    if request.method == 'POST':
+        try:
+            cursor.execute('''
+                            DELETE FROM dashboards WHERE id = ?
+                            ''', (dashboard_id,))
+            conn.commit()
+            print("Dashboard deleted successfully!")
+
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}", "error")
+
+    conn.close()
+    return redirect(url_for('all_dashboards'))
 
 
 @app.route('/dashboards', methods=['GET'])
