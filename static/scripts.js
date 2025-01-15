@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function () {
         new bootstrap.Popover(popoverElement, {
             html: true // Enable HTML content
         });
+
+        // Remove aria-hidden if present
+        popoverElement.removeAttribute('aria-hidden');
     });
 });
 
@@ -106,7 +109,6 @@ function performSearch() {
     window.location.href = `/database?query=${encodeURIComponent(query)}`;
 }
 
-     updateDropdownText('button2', groupCheckboxes, 'Select group to add layer to');
-        });
-    });
-});
+
+
+
