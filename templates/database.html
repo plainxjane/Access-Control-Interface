@@ -31,81 +31,82 @@
     <div class="row me-auto mb-2 mb-lg-0">
         <h1>Access Control Matrix</h1>
     </div>
-    <div class="row mt-4>">
+    <div class="row mt-4">
         <div class="col">
             <div class="table-responsive" style="overflow-x: auto;">
                 <table class="table table-bordered table-header-rotated" id="users-table">
                     <thead>
-                    <tr class="empty-row">
-                        <td rowspan="2" colspan="2"></td>
-                        <th colspan="{{ total_column_spans }}" class="text-center" id="layers-header">Layers</th>
-                    </tr>
-                    <tr class="empty-row">
-                        {% for department in departments %}
-                        <th colspan="{{ grouped_layers[department] | length or 1 }}" class="text-center" id="department_name">{{ department }}</th>
-                        {% endfor %}
-                    </tr>
-                    <tr class="sticky-row">
-                        <th style="width: 40px;"></th>
-                        <th style="width: 150px;" id="right-border-1">Name</th>
-                        {% for department in departments %}
-                        {% for layer in grouped_layers[department] %}
-                        <th class="rotate-90 {% if loop.first %}leftmost-border{% endif %} {% if loop.last %}rightmost-border{% endif %}">
-                            <div class="rotate-90" style="rotate(">{{ layer }}</div>
-                        </th>
-                    {% endfor %}
-                        {% if grouped_layers[department] | length == 0 %}
-                        <th></th>
-                        {% endif %}
-                    {% endfor %}
-                    </tr>
+                        <tr class="empty-row">
+                            <td rowspan="2" colspan="2"></td>
+                            <th colspan="{{ total_column_spans }}" class="text-center" id="layers-header">Layers & Dashboards</th>
+                        </tr>
+                        <tr class="empty-row">
+                            {% for department in departments %}
+                            <th colspan="{{ grouped_items[department] | length or 1 }}" class="text-center" id="department_name">{{ department }}</th>
+                            {% endfor %}
+                        </tr>
+                        <tr class="sticky-row">
+                            <th style="width: 40px;"></th>
+                            <th style="width: 150px;" id="right-border-1">Name</th>
+                            {% for department in departments %}
+                                {% for item in grouped_items[department] %}
+                                <th class="rotate-90 {% if loop.first %}leftmost-border{% endif %} {% if loop.last %}rightmost-border{% endif %}">
+                                    <div class="rotate-90">{{ item }}</div>
+                                </th>
+                                {% endfor %}
+                                {% if grouped_items[department] | length == 0 %}
+                                <th></th>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
                     </thead>
                     <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>
-                            <i class="fa-solid fa-circle-info"
-                                data-bs-toggle="popover"
-                                data-bs-title="{{ ', '.join(user.department) }}"
-                                data-bs-content="{% for group in user.groups %}&bull; {{ group }}<br>{% endfor %}"
-                                style="cursor: pointer">
-                            </i>
-                        </td>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <i class="fa-solid fa-circle-info"
+                                    data-bs-toggle="popover"
+                                    data-bs-title="{{ ', '.join(user.department) }}"
+                                    data-bs-content="{% for group in user.groups %}&bull; {{ group }}<br>{% endfor %}"
+                                    style="cursor: pointer">
+                                </i>
+                            </td>
 
-                        <!-- Name -->
-                        <td id="right-border-2">{{ user.name }}</td>
-                        <!-- Permissions for each Layer -->
-                        {% for department in departments %}
-                        {% for layer in grouped_layers[department] %}
-                        <td class="{% if loop.first %}leftmost-border{% endif %} {% if loop.last %}rightmost-border{% endif %}">
-                            {% set permissions= [] %}
+                            <!-- Name -->
+                            <td id="right-border-2">{{ user.name }}</td>
+                            <!-- Permissions for each item (Dashboards + Layers) -->
+                            {% for department in departments %}
+                                {% for item in grouped_items[department] %}
+                                <td class="{% if loop.first %}leftmost-border{% endif %} {% if loop.last %}rightmost-border{% endif %}">
+                                    {% set permissions = [] %}
 
-                            {% if layer in user.editor %}
-                            {% set permissions = permissions + ['E'] %}
-                            {% endif %}
-                            {% if layer in user.viewer %}
-                            {% set permissions = permissions + ['V'] %}
-                            {% endif %}
+                                    {% if item in user.editor %}
+                                    {% set permissions = permissions + ['E'] %}
+                                    {% endif %}
+                                    {% if item in user.viewer %}
+                                    {% set permissions = permissions + ['V'] %}
+                                    {% endif %}
 
-                            {% if permissions %}
-                            {{ permissions | join(' + ') }}
-                            {% else %}
-                            {{ 'NV' }}
-                            {% endif %}
-                        </td>
+                                    {% if permissions %}
+                                    {{ permissions | join(' + ') }}
+                                    {% else %}
+                                    {{ 'NV' }}
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                                {% if grouped_items[department] | length == 0 %}
+                                <td></td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
                         {% endfor %}
-                        {% if grouped_layers[department] | length == 0 %}
-                        <td></td>
-                        {% endif %}
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Download as Excel button -->
 <div class="container-fluid px-4">
@@ -125,6 +126,7 @@
         <p style="margin: 0;"><b>NV</b>: Non-Viewable</p>
         <p style="margin: 0;"><b>V</b>: Viewable</p>
         <p style="margin: 0;"><b>E</b>: Editable</p>
+        <p style="margin: 0;"><b>*</b>: Dashboard</p>
     </div>
 </div>
 <br>

@@ -517,6 +517,10 @@ def add_dashboard():
         departments = add_dashboard_form.department.data
         groups = add_dashboard_form.groups.data
 
+         # automatically add '*' prefix to the dashboard name
+        if not name.startswith('*'):
+            name = f'*{name}'
+
         # convert lists into comma-separated strings
         department_string = ', '.join(departments)
         group_string = ', '.join(groups)
@@ -577,6 +581,10 @@ def update_dashboard(dashboard_id):
         updated_name = update_dashboard_form.name.data
         updated_department = update_dashboard_form.department.data
         updated_groups = update_dashboard_form.groups.data
+
+        # automatically add '*' prefix to the dashboard name
+        if not updated_name.startswith('*'):
+            updated_name = f'*{updated_name}'
 
         # convert lists into comma-separated strings
         department_string = ', '.join(updated_department)
@@ -668,6 +676,10 @@ def database():
     cursor.execute('SELECT name, department, groups FROM layers')
     layers = cursor.fetchall()
 
+    # fetch all dashboards
+    cursor.execute('SELECT name, department, groups FROM dashboards')
+    dashboards = cursor.fetchall()
+
     # fetch all departments
     cursor.execute('SELECT name FROM departments')
     departments = [dept[0] for dept in cursor.fetchall()]
@@ -679,9 +691,23 @@ def database():
         if department in grouped_layers:
             grouped_layers[department].append(layer[0])
 
+    # group dashboards under their respective department
+    grouped_dashboards = {dept: [] for dept in departments}
+    for dashboard in dashboards:
+        department = dashboard [1]
+        if department in grouped_dashboards:
+            grouped_dashboards[department].append(dashboard[0])
+
+    # combine dashboards & layers, ensuring dashboards come first
+    grouped_items = {}
+    for department in departments:
+        dashboards = grouped_dashboards.get(department, [])
+        layers = grouped_layers.get(department, [])
+        grouped_items[department] = dashboards + layers
+
     # calculate column spans under each department dynamically
     column_spans = {
-        dept: max(len(grouped_layers.get(dept, [])), 1) for dept in departments
+        dept: max(len(grouped_items.get(dept, [])), 1) for dept in departments
     }
     total_column_spans = sum(column_spans.values())
 
@@ -699,7 +725,7 @@ def database():
 
     conn.close()
     return render_template('database.html', users=split_users, layers=layers,
-                           grouped_layers=grouped_layers,
+                           grouped_layers=grouped_layers, grouped_items=grouped_items,
                            departments=departments, total_column_spans=total_column_spans, query=search_query)
 
 
