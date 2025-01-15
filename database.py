@@ -36,7 +36,8 @@ def init_db():
         department TEXT NOT NULL,
         groups TEXT NOT NULL, 
         editor TEXT NOT NULL,
-        viewer TEXT NOT NULL
+        viewer TEXT NOT NULL,
+        owner TEXT NOT NULL
     )
     ''')
 

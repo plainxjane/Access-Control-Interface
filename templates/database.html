@@ -86,6 +86,9 @@
                                     {% if item in user.viewer %}
                                     {% set permissions = permissions + ['V'] %}
                                     {% endif %}
+                                    {% if item in user.owner %}
+                                    {% set permissions = permissions + ['O'] %}
+                                    {% endif %}
 
                                     {% if permissions %}
                                     {{ permissions | join(' + ') }}

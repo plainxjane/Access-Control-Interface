@@ -231,6 +231,10 @@ def add_user():
     cursor.execute('SELECT name, groups FROM layers')
     layers = cursor.fetchall()
 
+    # fetch dashboards
+    cursor.execute('SELECT name, groups FROM dashboards')
+    dashboards = cursor.fetchall()
+
     # fetch layers & group them by groups
     cursor.execute('SELECT name, groups FROM layers')
     layers_by_group = {}
@@ -239,29 +243,30 @@ def add_user():
             layers_by_group[group] = []
         layers_by_group[group].append(layer_name)
 
-    # Flatten all layers
+    # flatten all layers
     all_layers = [layer for layers in layers_by_group.values() for layer in layers]
 
     # populate form with existing choices
     add_user_form.department.choices = [(dept, dept) for dept in departments]
     add_user_form.groups.choices = [(grp, grp) for grp in groups]
-    add_user_form.editor.choices = [(layer, layer) for layer in all_layers]
-    add_user_form.viewer.choices = [(layer, layer) for layer in all_layers]
+    add_user_form.dashboards.choices = [(dashboard[0], dashboard[0]) for dashboard in dashboards]
 
     # process form submission
     if request.method == 'POST' and add_user_form.validate_on_submit():
         name = add_user_form.name.data
         departments = add_user_form.department.data
         user_groups = set(add_user_form.groups.data)
+        selected_dashboards = set(add_user_form.dashboards.data)
 
         # initialize permissions for layers
         editor = []
         viewer = []
+        owner = []
 
         # Debug: Print the user_groups
         print(f"User Groups: {user_groups}")
 
-        # Calculate and print the overlap between user's groups and each layer's groups
+        # process the permissions for each layer
         for layer_name, layer_groups in layers:
             # Convert the layer groups to a set for comparison
             layer_groups_set = set(group.strip() for group in layer_groups.split(', '))  # Remove leading/trailing spaces
@@ -278,20 +283,35 @@ def add_user():
                     editor.append(layer_name)
                     viewer.append(layer_name)
 
+        # process the permissions for each dashboard
+        for dashboard_name, dashboard_group in dashboards:
+            dashboard_group_set = set(group.strip() for group in dashboard_group.split(', '))
+            overlap = user_groups.intersection(dashboard_group_set)
+
+            if dashboard_name in selected_dashboards:
+                print(f"Adding {dashboard_name} to owner")
+                owner.append(dashboard_name)
+                continue
+
+            if overlap:
+                print(f"Adding {dashboard_name} to viewer")
+                viewer.append(dashboard_name)
+
         # convert lists into comma-separated strings
         department_string = ', '.join(departments)
         group_string = ', '.join(user_groups)
         editor_string = ', '.join(editor)
         viewer_string = ', '.join(viewer)
+        owner_string = ', '.join(owner)
 
         # insert into SQLite database
         try:
             # insert new user into users table
             cursor.execute('''
-                    INSERT INTO users (name, department, groups, editor, viewer)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO users (name, department, groups, editor, viewer, owner)
+                    VALUES (?, ?, ?, ?, ?, ?)
                     ''', (
-                name, department_string, group_string, editor_string, viewer_string))
+                name, department_string, group_string, editor_string, viewer_string, owner_string))
 
             conn.commit()
 
@@ -721,6 +741,7 @@ def database():
             'groups': user[3].split(', '),
             'editor': user[4].split(', '),
             'viewer': user[5].split(', '),
+            'owner': user[6].split(', '),
         })
 
     conn.close()

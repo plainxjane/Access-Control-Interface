@@ -106,3 +106,7 @@ function performSearch() {
     window.location.href = `/database?query=${encodeURIComponent(query)}`;
 }
 
+     updateDropdownText('button2', groupCheckboxes, 'Select group to add layer to');
+        });
+    });
+});

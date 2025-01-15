@@ -65,6 +65,7 @@ class AddUserForm(FlaskForm):
     departments = fetch_choices('departments')
     groups = fetch_choices('groups')
     layers = fetch_choices('layers')
+    dashboards = fetch_choices('dashboards')
 
     name = StringField('Name')
     department = SelectMultipleField('Department', choices=departments, coerce=str,
@@ -77,6 +78,9 @@ class AddUserForm(FlaskForm):
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
     viewer = SelectMultipleField('Viewer', choices=layers, coerce=str,
+                                 widget=ListWidget(prefix_label=False),
+                                 option_widget=CheckboxInput(), )
+    dashboards = SelectMultipleField('Dashboards (Owner)', choices=dashboards, coerce=str,
                                  widget=ListWidget(prefix_label=False),
                                  option_widget=CheckboxInput(), )
     submit = SubmitField('Submit')
