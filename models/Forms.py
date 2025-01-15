@@ -130,3 +130,21 @@ class AddDashboardForm(FlaskForm):
                                  option_widget=CheckboxInput(),
                                  )
     submit = SubmitField('Submit')
+
+
+class UpdateDashboardForm(FlaskForm):
+    # dynamically populate choices for Departments & Groups from sqlite database
+    departments = fetch_choices('departments')
+    groups = fetch_choices('groups')
+
+    name = StringField('Name')
+    department = SelectMultipleField('Department', choices=departments, coerce=str,
+                                     widget=ListWidget(prefix_label=False),
+                                     option_widget=CheckboxInput(),
+                                     )
+
+    groups = SelectMultipleField('Group', choices=groups, coerce=str,
+                                 widget=ListWidget(prefix_label=False),
+                                 option_widget=CheckboxInput(),
+                                 )
+    submit = SubmitField('Submit')

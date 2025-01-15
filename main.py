@@ -1,6 +1,6 @@
 from flask import Flask, g, flash, request, redirect, render_template, url_for, session, jsonify
 from models.Forms import LoginForm, AddLayerForm, UpdateLayerForm, AddUserForm, UpdateUserForm, AddDepartmentForm, \
-    AddGroupForm, AddDashboardForm
+    AddGroupForm, AddDashboardForm, UpdateDashboardForm
 from wrappers import login_required
 import sqlite3
 
@@ -540,10 +540,66 @@ def add_dashboard():
     return render_template('add_dashboard.html', form=add_dashboard_form)
 
 
-@app.route('/update_dashboard', methods=['POST', 'GET'])
+@app.route('/update_dashboard/<int:dashboard_id>', methods=['POST', 'GET'])
 @login_required
-def update_dashboard():
-    return render_template('update_dashboard.html')
+def update_dashboard(dashboard_id):
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # fetch dashboards
+    cursor.execute('SELECT * FROM dashboards WHERE id = ?',
+                   (dashboard_id,))
+    dashboard_data = cursor.fetchone()
+
+    if not dashboard_data:
+        print("Dashboard not found!")
+        return redirect(url_for('all_dashboards'))
+
+    # fetch departments
+    cursor.execute('SELECT name FROM departments')
+    departments = [row[0] for row in cursor.fetchall()]
+
+    # fetch groups
+    cursor.execute('SELECT name FROM groups')
+    groups = [row[0] for row in cursor.fetchall()]
+
+    # initialize the update dashboard form
+    update_dashboard_form = UpdateDashboardForm(name=dashboard_data[1], department=dashboard_data[2].split(', '),
+                                        groups=dashboard_data[3].split(', '))
+
+    # update form fields
+    update_dashboard_form.department.choices = [(dept, dept) for dept in departments]
+    update_dashboard_form.groups.choices = [(grp, grp) for grp in groups]
+
+    # process form submission
+    if request.method == 'POST' and update_dashboard_form.validate_on_submit():
+        updated_name = update_dashboard_form.name.data
+        updated_department = update_dashboard_form.department.data
+        updated_groups = update_dashboard_form.groups.data
+
+        # convert lists into comma-separated strings
+        department_string = ', '.join(updated_department)
+        group_string = ', '.join(updated_groups)
+
+        # update sqlite database
+        try:
+            conn = sqlite3.connect(DATABASE)
+            cursor = conn.cursor()
+            cursor.execute('''
+                                UPDATE dashboards
+                                SET name = ?, department = ?, groups = ?
+                                WHERE id = ?
+                            ''', (updated_name, department_string, group_string, dashboard_id,))
+            conn.commit()
+
+            return redirect(url_for('all_dashboards'))
+
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}", "error")
+
+    conn.close()
+    return render_template('update_dashboard.html', form=update_dashboard_form, dashboard_data=dashboard_data)
 
 
 @app.route('/delete_dashboard', methods=['POST'])
@@ -552,7 +608,7 @@ def delete_dashboard():
     pass
 
 
-@app.route('/dashboards')
+@app.route('/dashboards', methods=['GET'])
 @login_required
 def all_dashboards():
     # connect to database
@@ -570,7 +626,7 @@ def all_dashboards():
     rows = cursor.fetchall()
 
     conn.close()
-    return render_template('dashboards.html', dashboards=rows)
+    return render_template('dashboards.html', dashboards=rows, query=search_query)
 
 
 @app.route('/database', methods=['GET'])
