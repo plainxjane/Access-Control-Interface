@@ -1,10 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %} Add Dashboard {% endblock %}
+
+{% block content %}
+
+<br><br><br>
+<!-- Heading -->
+<div class="container text-left">
+    <div class="row">
+        <div class="col-6"><h2>Add a dashboard</h2></div>
+    </div>
+</div>
+<br><br>
+
+<!-- Add Dashboard Form -->
+<div class="container">
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token() }}
+        {{ form.hidden_tag() }}
+
+        <!-- Name Input -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.name.label }} {{ form.name(class="form-control form-control-md", autocomplete="off") }}
+            </div>
+        </div>
+        <br>
+
+        <!-- Department Input -->
+         <div class="row mb-3">
+            <div class="col-6">
+                {{ form.department.label }}
+
+                <!-- Custom Dropdown Select -->
+                <div class="dropdown">
+                    <!-- Dropdown Toggle Button -->
+                    <button
+                        class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                        type="button"
+                        id="button1"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Select department to add layer to
+                        <span class="dropdown-icon"></span>
+                    </button>
+
+                    <!-- Dropdown Menu with Checkboxes -->
+                    <div class="dropdown-menu p-3 w-100">
+                        {% for subfield in form.department %}
+                        <div class="form-check">
+                            <!-- Render Checkbox -->
+                            {{ subfield(**{'class': 'form-check-input'}) }}
+
+                            <!-- Checkbox Label -->
+                            <label class="form-check-label" for="{{ subfield.id }}">
+                                {{ subfield.label.text }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+         </div>
+        <br>
+
+        <!-- Group Input -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.groups.label }}
+
+                <!-- Custom Dropdown Select -->
+                <div class="dropdown">
+                    <!-- Dropdown Toggle Button -->
+                    <button
+                        class="btn dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                        type="button"
+                        id="button2"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Select group to add layer to
+                        <span class="dropdown-icon"></span>
+                    </button>
+
+                    <!-- Dropdown Menu with Checkboxes -->
+                    <div class="dropdown-menu p-3 w-100">
+                        {% for subfield in form.groups %}
+                            <div class="form-check">
+                                <!-- Render Checkbox -->
+                                {{ subfield(**{'class': 'form-check-input'}) }}
+                                <!-- Checkbox Label -->
+                                <label class="form-check-label" for="{{ subfield.id }}">
+                                    {{ subfield.label.text }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+
+        <!-- Submit Button -->
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.submit(class="btn btn-primary submit-btn", value="Submit", style="float: right;", id="submit_button") }}
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

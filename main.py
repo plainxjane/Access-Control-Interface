@@ -1,6 +1,6 @@
 from flask import Flask, g, flash, request, redirect, render_template, url_for, session, jsonify
 from models.Forms import LoginForm, AddLayerForm, UpdateLayerForm, AddUserForm, UpdateUserForm, AddDepartmentForm, \
-    AddGroupForm
+    AddGroupForm, AddDashboardForm
 from wrappers import login_required
 import sqlite3
 
@@ -493,13 +493,57 @@ def all_users():
 @app.route('/add_dashboard', methods=['POST', 'GET'])
 @login_required
 def add_dashboard():
-    pass
+    add_dashboard_form = AddDashboardForm()
+
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # fetch departments
+    cursor.execute('SELECT name FROM departments')
+    departments = [row[0] for row in cursor.fetchall()]
+
+    # fetch groups
+    cursor.execute('SELECT name FROM groups')
+    groups = [row[0] for row in cursor.fetchall()]
+
+    # populate form fields
+    add_dashboard_form.department.choices = [(dept, dept) for dept in departments]
+    add_dashboard_form.groups.choices = [(grp, grp) for grp in groups]
+
+    if request.method == 'POST' and add_dashboard_form.validate_on_submit():
+        # process the form data
+        name = add_dashboard_form.name.data
+        departments = add_dashboard_form.department.data
+        groups = add_dashboard_form.groups.data
+
+        # convert lists into comma-separated strings
+        department_string = ', '.join(departments)
+        group_string = ', '.join(groups)
+
+        # insert into SQLite database
+        try:
+            cursor.execute('''
+                    INSERT INTO dashboards (name, department, groups)
+                    VALUES (?, ?, ?)
+                    ''', (name, department_string, group_string))
+
+            conn.commit()
+
+            print('Dashboard added successfully!')
+            return redirect(url_for('all_dashboards'))
+
+        except sqlite3.Error as e:
+            print(f"An error: {e}")
+
+    conn.close()
+    return render_template('add_dashboard.html', form=add_dashboard_form)
 
 
 @app.route('/update_dashboard', methods=['POST', 'GET'])
 @login_required
 def update_dashboard():
-    pass
+    return render_template('update_dashboard.html')
 
 
 @app.route('/delete_dashboard', methods=['POST'])
@@ -511,7 +555,22 @@ def delete_dashboard():
 @app.route('/dashboards')
 @login_required
 def all_dashboards():
-    pass
+    # connect to database
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # fetch search query (if any)
+    search_query = request.args.get('query', '').strip()
+
+    # fetch relevant dashboards based on search query
+    if search_query:
+        cursor.execute('SELECT * FROM dashboards WHERE name LIKE ? ORDER BY name ASC', (f"%{search_query}%",))
+    else:
+        cursor.execute('SELECT * FROM dashboards ORDER BY name ASC')
+    rows = cursor.fetchall()
+
+    conn.close()
+    return render_template('dashboards.html', dashboards=rows)
 
 
 @app.route('/database', methods=['GET'])

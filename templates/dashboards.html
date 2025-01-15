@@ -1,10 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %} All Layers {% endblock %}
+
+{% block content %}
+
+<br><br><br>
+
+<!-- Dashboard Information Table -->
+<div class="container-fluid px-4">
+    <div class="row me-auto mb-2 mb-lg-0">
+        <h1>All Dashboards</h1>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col">
+            <table class="table table-bordered" id="layers-table">
+                <thead>
+                <tr>
+                    <th>Edit Dashboard</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Group</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for dashboard in dashboards %}
+                <tr>
+                    <!-- Edit Layer -->
+                    <td>
+                        <a href="/update_dashboard/{{ dashboard[0] }}"><i class="fa-regular fa-pen-to-square"
+                                                                style="color: #03ac13"></i></a>
+                    </td>
+                    <!-- Name -->
+                    <td>{{ dashboard[1] }}</td>
+                    <!-- Department -->
+                    <td>
+                        {% for dept in dashboard[2].split(', ') %}
+                        {{ dept }} <br>
+                        {% endfor %}
+                    </td>
+                    <!-- Group -->
+                    <td>
+                        {% for grp in dashboard[3].split(', ') %}
+                        &bull; {{ grp }} <br>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
