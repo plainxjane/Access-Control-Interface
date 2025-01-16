@@ -4,6 +4,35 @@
 
 {% block content %}
 
+<!-- Modal Template -->
+<div class="modal fade" id="userExistsModal" tabindex="-1" aria-labelledby="userExistsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="userExistsModalLabel">Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                User already exists! Please try again with a different name.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if user_exists %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const userExistsModal = new bootstrap.Modal(document.getElementById('userExistsModal'));
+        userExistsModal.show();
+    });
+</script>
+{% endif %}
+
+
+
 <br><br><br>
 <!-- Heading -->
 <div class="container text-left">

@@ -258,6 +258,13 @@ def add_user():
         user_groups = set(add_user_form.groups.data)
         selected_dashboards = set(add_user_form.dashboards.data)
 
+        # check if user already exists ( duplicate users not allowed )
+        cursor.execute('SELECT COUNT(*) FROM users WHERE name = ?', (name,))
+        if cursor.fetchone()[0] > 0:
+            flash(f"User '{name}' already exists!", 'danger')
+            print('user already exists')
+            return render_template('add_user.html', form=add_user_form, layers_by_group=layers_by_group, user_exists=True)
+
         # initialize permissions for layers
         editor = []
         viewer = []
