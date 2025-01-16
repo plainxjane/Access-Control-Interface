@@ -41,16 +41,16 @@
                         id="button1"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        Select department to add layer to
+                       Select department to add layer to
                         <span class="dropdown-icon"></span>
                     </button>
 
                     <!-- Dropdown Menu with Checkboxes -->
-                    <div class="dropdown-menu p-3 w-100">
+                    <div class="dropdown-menu p-3 w-100" id="department-dropdown-menu">
                         {% for subfield in form.department %}
                         <div class="form-check">
                             <!-- Render Checkbox -->
-                            {{ subfield(**{'class': 'form-check-input'}) }}
+                            {{ subfield(**{'class': 'form-check-input', 'data-department-name': subfield.label.text}) }}
 
                             <!-- Checkbox Label -->
                             <label class="form-check-label" for="{{ subfield.id }}">
@@ -83,7 +83,7 @@
                     </button>
 
                     <!-- Dropdown Menu with Checkboxes -->
-                    <div class="dropdown-menu p-3 w-100">
+                    <div class="dropdown-menu p-3 w-100" id="group-dropdown-menu">
                         {% for subfield in form.groups %}
                             <div class="form-check">
                                 <!-- Render Checkbox -->
@@ -108,5 +108,53 @@
         </div>
     </form>
 </div>
+
+<script>
+    // live update selection for departments
+    const department_dropdownButton =
+              document.getElementById('button1');
+        const department_dropdownMenu =
+              document.getElementById('department-dropdown-menu');
+        let department_mySelectedItems = [];
+
+        function handleCB1(event) {
+            const department_checkbox = event.target;
+            if (department_checkbox.checked) {
+                department_mySelectedItems.push(department_checkbox.value);
+            } else {
+                department_mySelectedItems =
+                  department_mySelectedItems.filter((item) => item !== department_checkbox.value);
+            }
+
+            department_dropdownButton.innerHTML = department_mySelectedItems.length > 0
+                ? department_mySelectedItems.join('<br>') : 'Select department to add layer to';
+        }
+
+        department_dropdownMenu.addEventListener('change', handleCB1);
+
+    // live update selection for groups
+    const group_dropdownButton =
+              document.getElementById('button2');
+        const group_dropdownMenu =
+              document.getElementById('group-dropdown-menu');
+        let group_mySelectedItems = [];
+
+        function handleCB2(event) {
+            const group_checkbox = event.target;
+            if (group_checkbox.checked) {
+                group_mySelectedItems.push(group_checkbox.value);
+            } else {
+                group_mySelectedItems =
+                  group_mySelectedItems.filter((item) => item !== group_checkbox.value);
+            }
+
+            group_dropdownButton.innerHTML = group_mySelectedItems.length > 0
+                ? group_mySelectedItems.join('<br>') : 'Select group to add layer to';
+        }
+
+        group_dropdownMenu.addEventListener('change', handleCB2);
+
+
+</script>
 
 {% endblock %}

@@ -109,6 +109,3 @@ function performSearch() {
     window.location.href = `/database?query=${encodeURIComponent(query)}`;
 }
 
-
-
-
