@@ -32,7 +32,6 @@
 {% endif %}
 
 
-
 <br><br><br>
 <!-- Heading -->
 <div class="container text-left">
@@ -65,17 +64,17 @@
                 <div class="dropdown">
                     <!-- Dropdown Toggle Button -->
                     <button
-                        class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
-                        type="button"
-                        id="button1"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                            class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                            type="button"
+                            id="button3"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
                         Select user's department
                         <span class="dropdown-icon"></span>
                     </button>
 
                     <!-- Dropdown Menu with Checkboxes -->
-                    <div class="dropdown-menu p-3 w-100">
+                    <div class="dropdown-menu p-3 w-100" id="department-dropdown-menu">
                         {% for subfield in form.department %}
                         <div class="form-check">
                             <!-- Render Checkbox -->
@@ -90,7 +89,7 @@
                     </div>
                 </div>
             </div>
-         </div>
+        </div>
         <br>
 
         <!-- Group Input -->
@@ -102,26 +101,26 @@
                 <div class="dropdown">
                     <!-- Dropdown Toggle Button -->
                     <button
-                        class="btn dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
-                        type="button"
-                        id="button2"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                            class="btn dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                            type="button"
+                            id="button4"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
                         Select user's group
                         <span class="dropdown-icon"></span>
                     </button>
 
                     <!-- Dropdown Menu with Checkboxes -->
-                    <div class="dropdown-menu p-3 w-100">
+                    <div class="dropdown-menu p-3 w-100" id="group-dropdown-menu">
                         {% for subfield in form.groups %}
-                            <div class="form-check">
-                                <!-- Render Checkbox -->
-                                {{ subfield(**{'class': 'form-check-input'}) }}
-                                <!-- Checkbox Label -->
-                                <label class="form-check-label" for="{{ subfield.id }}">
-                                    {{ subfield.label.text }}
-                                </label>
-                            </div>
+                        <div class="form-check">
+                            <!-- Render Checkbox -->
+                            {{ subfield(**{'class': 'form-check-input'}) }}
+                            <!-- Checkbox Label -->
+                            <label class="form-check-label" for="{{ subfield.id }}">
+                                {{ subfield.label.text }}
+                            </label>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -130,50 +129,120 @@
         <br>
 
         <!-- Dashboards Input -->
-<div class="row mb-3">
-    <div class="col-6">
-        {{ form.dashboards.label }}
+        <div class="row mb-3">
+            <div class="col-6">
+                {{ form.dashboards.label }}
 
-        <!-- Custom Dropdown Select -->
-        <div class="dropdown">
-            <!-- Dropdown Toggle Button -->
-            <button
-                class="btn dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
-                type="button"
-                id="button3"
-                data-bs-toggle="dropdown"
-                aria-expanded="false">
-                Select dashboards the user will own
-                <span class="dropdown-icon"></span>
-            </button>
+                <!-- Custom Dropdown Select -->
+                <div class="dropdown">
+                    <!-- Dropdown Toggle Button -->
+                    <button
+                            class="btn dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                            type="button"
+                            id="button5"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        Select dashboards the user will own
+                        <span class="dropdown-icon"></span>
+                    </button>
 
-            <!-- Dropdown Menu with Checkboxes -->
-            <div class="dropdown-menu p-3 w-100">
-                {% for subfield in form.dashboards %}
-                <div class="form-check">
-                    <!-- Render Checkbox -->
-                    {{ subfield(**{'class': 'form-check-input'}) }}
+                    <!-- Dropdown Menu with Checkboxes -->
+                    <div class="dropdown-menu p-3 w-100" id="dashboard-dropdown-menu">
+                        {% for subfield in form.dashboards %}
+                        <div class="form-check">
+                            <!-- Render Checkbox -->
+                            {{ subfield(**{'class': 'form-check-input'}) }}
 
-                    <!-- Checkbox Label -->
-                    <label class="form-check-label" for="{{ subfield.id }}">
-                        {{ subfield.label.text }}
-                    </label>
+                            <!-- Checkbox Label -->
+                            <label class="form-check-label" for="{{ subfield.id }}">
+                                {{ subfield.label.text }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
-                {% endfor %}
             </div>
         </div>
-    </div>
-</div>
-<br>
+        <br>
 
 
         <!-- Submit Button -->
         <div class="row mb-3">
             <div class="col-6">
-                {{ form.submit(class="btn btn-primary submit-btn", value="Submit", style="float: right;", id="submit_button") }}
+                {{ form.submit(class="btn btn-primary submit-btn", value="Submit", style="float: right;",
+                id="submit_button") }}
             </div>
         </div>
 
     </form>
 </div>
+
+<script>
+    // live update selection for departments
+    const department_dropdownButton =
+              document.getElementById('button3');
+        const department_dropdownMenu =
+              document.getElementById('department-dropdown-menu');
+        let department_mySelectedItems = [];
+
+        function handleCB1(event) {
+            const department_checkbox = event.target;
+            if (department_checkbox.checked) {
+                department_mySelectedItems.push(department_checkbox.value);
+            } else {
+                department_mySelectedItems =
+                  department_mySelectedItems.filter((item) => item !== department_checkbox.value);
+            }
+
+            department_dropdownButton.innerHTML = department_mySelectedItems.length > 0
+                ? department_mySelectedItems.join('<br>') : 'Select department to add layer to';
+        }
+
+        department_dropdownMenu.addEventListener('change', handleCB1);
+
+    // live update selection for groups
+    const group_dropdownButton =
+              document.getElementById('button4');
+        const group_dropdownMenu =
+              document.getElementById('group-dropdown-menu');
+        let group_mySelectedItems = [];
+
+        function handleCB2(event) {
+            const group_checkbox = event.target;
+            if (group_checkbox.checked) {
+                group_mySelectedItems.push(group_checkbox.value);
+            } else {
+                group_mySelectedItems =
+                  group_mySelectedItems.filter((item) => item !== group_checkbox.value);
+            }
+
+            group_dropdownButton.innerHTML = group_mySelectedItems.length > 0
+                ? group_mySelectedItems.join('<br>') : 'Select group to add layer to';
+        }
+
+        group_dropdownMenu.addEventListener('change', handleCB2);
+
+    // live update selection for dashboards
+    const dashboard_dropdownButton =
+              document.getElementById('button5');
+        const dashboard_dropdownMenu =
+              document.getElementById('dashboard-dropdown-menu');
+        let dashboard_mySelectedItems = [];
+
+        function handleCB3(event) {
+            const dashboard_checkbox = event.target;
+            if (dashboard_checkbox.checked) {
+                dashboard_mySelectedItems.push(dashboard_checkbox.value);
+            } else {
+                dashboard_mySelectedItems =
+                  dashboard_mySelectedItems.filter((item) => item !== dashboard_checkbox.value);
+            }
+
+            dashboard_dropdownButton.innerHTML = dashboard_mySelectedItems.length > 0
+                ? dashboard_mySelectedItems.join('<br>') : 'Select dashboards the user will own';
+        }
+
+        dashboard_dropdownMenu.addEventListener('change', handleCB3);
+</script>
+
 {% endblock %}

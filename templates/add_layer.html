@@ -28,7 +28,7 @@
         <br>
 
         <!-- Department Input -->
-         <div class="row mb-3">
+        <div class="row mb-3">
             <div class="col-6">
                 {{ form.department.label }}
 
@@ -36,12 +36,12 @@
                 <div class="dropdown">
                     <!-- Dropdown Toggle Button -->
                     <button
-                        class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
-                        type="button"
-                        id="button1"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                       Select department to add layer to
+                            class="btn btn-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                            type="button"
+                            id="button1"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        Select department to add layer to
                         <span class="dropdown-icon"></span>
                     </button>
 
@@ -61,7 +61,7 @@
                     </div>
                 </div>
             </div>
-         </div>
+        </div>
         <br>
 
         <!-- Group Input -->
@@ -73,11 +73,11 @@
                 <div class="dropdown">
                     <!-- Dropdown Toggle Button -->
                     <button
-                        class="btn dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
-                        type="button"
-                        id="button2"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                            class="btn dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center"
+                            type="button"
+                            id="button2"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
                         Select group to add layer to
                         <span class="dropdown-icon"></span>
                     </button>
@@ -85,14 +85,14 @@
                     <!-- Dropdown Menu with Checkboxes -->
                     <div class="dropdown-menu p-3 w-100" id="group-dropdown-menu">
                         {% for subfield in form.groups %}
-                            <div class="form-check">
-                                <!-- Render Checkbox -->
-                                {{ subfield(**{'class': 'form-check-input'}) }}
-                                <!-- Checkbox Label -->
-                                <label class="form-check-label" for="{{ subfield.id }}">
-                                    {{ subfield.label.text }}
-                                </label>
-                            </div>
+                        <div class="form-check">
+                            <!-- Render Checkbox -->
+                            {{ subfield(**{'class': 'form-check-input'}) }}
+                            <!-- Checkbox Label -->
+                            <label class="form-check-label" for="{{ subfield.id }}">
+                                {{ subfield.label.text }}
+                            </label>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -103,7 +103,8 @@
         <!-- Submit Button -->
         <div class="row mb-3">
             <div class="col-6">
-                {{ form.submit(class="btn btn-primary submit-btn", value="Submit", style="float: right;", id="submit_button") }}
+                {{ form.submit(class="btn btn-primary submit-btn", value="Submit", style="float: right;",
+                id="submit_button") }}
             </div>
         </div>
     </form>
