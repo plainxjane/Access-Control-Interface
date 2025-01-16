@@ -20,8 +20,11 @@ def home():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     login_form = LoginForm()
+    login_failed = False
+
     if request.method == 'POST' and login_form.validate_on_submit():
         password = login_form.password.data
+
         if password == 'S&Lrail8':
             session['logged_in'] = True
             print("Login Successful!")
@@ -30,8 +33,9 @@ def login():
 
         else:
             flash('Login Unsuccessful. Please try again.', 'danger')
+            login_failed = True
 
-    return render_template('login.html', form=login_form)
+    return render_template('login.html', form=login_form, login_failed=login_failed)
 
 
 @app.route('/logout')

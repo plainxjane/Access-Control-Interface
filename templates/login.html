@@ -4,19 +4,37 @@
 
 {% block content %}
 
+<!-- Failed Login Modal -->
+<div class="modal fade" id="loginFailedModal" tabindex="-1" aria-labelledby="loginFailedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="loginFailedModalLabel">Login Failed</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Login was unsuccessful. Please check your credentials and try again.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if login_failed %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const loginFailedModal = new bootstrap.Modal(document.getElementById('loginFailedModal'));
+        loginFailedModal.show();
+    });
+</script>
+{% endif %}
+
+
 <div class="d-flex justify-content-center align-items-center vh-100">
     <div class="card p-4 shadow" style="width: 350px;">
         <h3 class="text-center mb-4">Enter Password</h3>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
         <form method="POST" enctype="multipart/form-data" action="/login">
             {{ form.csrf_token() }}
             {{ form.hidden_tag() }}
