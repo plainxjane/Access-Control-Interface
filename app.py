@@ -3,10 +3,11 @@ from models.Forms import LoginForm, AddLayerForm, UpdateLayerForm, AddUserForm, 
     AddGroupForm, AddDashboardForm, UpdateDashboardForm
 from wrappers import login_required
 import sqlite3
-import pandas as pd
+
 
 app = Flask(__name__)
 DATABASE = 'database.db'
+
 
 # config app
 app.config['SECRET_KEY'] = 'SECRET_KEY'
