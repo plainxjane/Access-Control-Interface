@@ -360,6 +360,10 @@ def update_user(user_id):
     cursor.execute('SELECT name FROM groups')
     groups = [row[0] for row in cursor.fetchall()]
 
+    # fetch dashboards
+    cursor.execute('SELECT name, groups FROM dashboards')
+    dashboards = cursor.fetchall()
+
     # fetch layers & group them by groups
     cursor.execute('SELECT name, groups FROM layers')
     layers = cursor.fetchall()
@@ -378,13 +382,15 @@ def update_user(user_id):
         department=user_data[2].split(', '),
         groups=user_data[3].split(', '),
         editor=user_data[4].split(', '),
-        viewer=user_data[5].split(', '))
+        viewer=user_data[5].split(', '),
+        dashboards=user_data[6].split(', '))
 
     # populate form fields
     update_user_form.department.choices = [(dept, dept) for dept in departments]
     update_user_form.groups.choices = [(grp, grp) for grp in groups]
     update_user_form.editor.choices = [(layer, layer) for layer in all_layers]
     update_user_form.viewer.choices = [(layer, layer) for layer in all_layers]
+    update_user_form.dashboards.choices = [(dashboard[0], dashboard[0]) for dashboard in dashboards]
 
     # process form submission
     if request.method == 'POST' and update_user_form.validate_on_submit():
@@ -393,10 +399,12 @@ def update_user(user_id):
         updated_groups = set(update_user_form.groups.data)
         explicit_editor_layers = set(update_user_form.editor.data)
         explicit_viewer_layers = set(update_user_form.viewer.data)
+        selected_dashboards = set(update_user_form.dashboards.data)
 
-        # update permissions dynamically
+        # update permissions dynamically for layers
         updated_editor_layers = set()
         updated_viewer_layers = set()
+        updated_owner_dashboards = set()
 
         # Debug: Print the user_groups
         print(f"User Groups: {updated_groups}")
@@ -416,11 +424,26 @@ def update_user(user_id):
                     updated_editor_layers.add(layer_name)  # Add to editor list
                     updated_viewer_layers.add(layer_name)
 
+        # process the permissions for each dashboard
+        for dashboard_name, dashboard_group in dashboards:
+            dashboard_group_set = set(group.strip() for group in dashboard_group.split(', '))
+            overlap = updated_groups.intersection(dashboard_group_set)
+
+            if dashboard_name in selected_dashboards:
+                print(f"Adding {dashboard_name} to owner")
+                updated_owner_dashboards.add(dashboard_name)
+                continue
+
+            if overlap:
+                print(f"Adding {dashboard_name} to viewer")
+                updated_viewer_layers.add(dashboard_name)
+
         # Convert to comma-separated strings for database storage
         updated_editor = ', '.join(updated_editor_layers)
         updated_viewer = ', '.join(updated_viewer_layers)
         updated_department = ', '.join(updated_department)
         updated_group = ', '.join(updated_groups)
+        updated_owner = ', '.join(updated_owner_dashboards)
 
         # update SQLite database
         try:
@@ -428,10 +451,10 @@ def update_user(user_id):
             cursor = conn.cursor()
             cursor.execute('''
             UPDATE users
-            SET name = ?, department = ?, groups = ?, editor = ?, viewer = ?
+            SET name = ?, department = ?, groups = ?, editor = ?, viewer = ?, owner = ?
             WHERE id = ?
             ''', (
-                updated_name, updated_department, updated_group, updated_editor, updated_viewer,
+                updated_name, updated_department, updated_group, updated_editor, updated_viewer, updated_owner,
                 user_id))
 
             conn.commit()
