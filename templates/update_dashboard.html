@@ -124,11 +124,11 @@
 
 <!-- Update UI after selection -->
 <script>
-    // set initial selected items for departments & groups
+    // set initial selected items for dashboard's departments & groups
     const initialDepartments = "{{ dashboard_data[2] }}".split(', ').filter(item => item.trim() !== '');
     const initialGroups = "{{ dashboard_data[3] }}".split(', ').filter(item => item.trim() !== '');
 
-    // live update selection for user's departments
+    // live update for dashboard's department
     const department_dropdownButton = document.getElementById('button13');
     department_dropdownButton.innerHTML = initialDepartments.length > 0
         ? initialDepartments.join('<br>') : 'Edit department to add dashboard to';
@@ -151,7 +151,7 @@
 
     department_dropdownMenu.addEventListener('change', handleCB1);
 
-    // live update selection for user's groups
+    // live update selection for dashboard's groups
     const group_dropdownButton = document.getElementById('button14');
     group_dropdownButton.innerHTML = initialGroups.length > 0
         ? initialGroups.join('<br>') : 'Edit group to add dashboard to';

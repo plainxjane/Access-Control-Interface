@@ -201,7 +201,7 @@ def all_layers():
 
     # fetch layers based on selected departments
     if 'all' in selected_departments or not selected_departments:
-        # if "All Departments' is selected or no filter is applied, fetch ALL layers
+        # if "All Departments" is selected or no filter is applied, fetch ALL layers
         cursor.execute('SELECT * FROM layers ORDER BY name ASC')
     else:
         # if specific departments are selected, filter layers by those departments
