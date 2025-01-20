@@ -41,7 +41,7 @@
                         id="button8"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        Edit department to add layer to
+                        {{ layer_data[2] | default('Edit department to add layer to') }}
                         <span class="dropdown-icon"></span>
                     </button>
 
@@ -78,7 +78,7 @@
                         id="button9"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        Edit group to add layer to
+                        {{ layer_data[3] | default('Edit group to add layer to') }}
                         <span class="dropdown-icon"></span>
                     </button>
 
@@ -122,50 +122,57 @@
         </div>
 </div>
 
+<!-- Update UI after selection -->
 <script>
+    // set initial selected items for departments & groups
+    const initialDepartments = "{{ layer_data[2] }}".split(', ');
+    const initialGroups = "{{ layer_data[3] }}".split(', ');
+
     // live update selection for layer's departments
-    const department_dropdownButton =
-              document.getElementById('button8');
-        const department_dropdownMenu =
-              document.getElementById('department-dropdown-menu');
-        let department_mySelectedItems = [];
+    const department_dropdownButton = document.getElementById('button8');
+    department_dropdownButton.innerHTML = initialDepartments.length > 0
+        ? initialDepartments.join('<br>') : 'Edit department to add layer to';
 
-        function handleCB1(event) {
-            const department_checkbox = event.target;
-            if (department_checkbox.checked) {
-                department_mySelectedItems.push(department_checkbox.value);
-            } else {
-                department_mySelectedItems =
-                  department_mySelectedItems.filter((item) => item !== department_checkbox.value);
-            }
+    const department_dropdownMenu = document.getElementById('department-dropdown-menu');
+    let department_mySelectedItems = [...initialDepartments];
 
-            department_dropdownButton.innerHTML = department_mySelectedItems.length > 0
-                ? department_mySelectedItems.join('<br>') : 'Select department to add layer to';
+    function handleCB1(event) {
+        const department_checkbox = event.target;
+        if (department_checkbox.checked) {
+            department_mySelectedItems.push(department_checkbox.value);
+        } else {
+            department_mySelectedItems =
+              department_mySelectedItems.filter((item) => item !== department_checkbox.value);
         }
 
-        department_dropdownMenu.addEventListener('change', handleCB1);
+        department_dropdownButton.innerHTML = department_mySelectedItems.length > 0
+            ? department_mySelectedItems.join('<br>') : 'Edit department to add layer to';
+    }
+
+    department_dropdownMenu.addEventListener('change', handleCB1);
 
     // live update selection for layer's groups
-    const group_dropdownButton =
-              document.getElementById('button9');
-        const group_dropdownMenu =
-              document.getElementById('group-dropdown-menu');
-        let group_mySelectedItems = [];
+    const group_dropdownButton = document.getElementById('button9');
+    group_dropdownButton.innerHTML = initialGroups.length > 0
+        ? initialGroups.join('<br>') : 'Edit group to add layer to';
 
-        function handleCB2(event) {
-            const group_checkbox = event.target;
-            if (group_checkbox.checked) {
-                group_mySelectedItems.push(group_checkbox.value);
-            } else {
-                group_mySelectedItems =
-                  group_mySelectedItems.filter((item) => item !== group_checkbox.value);
-            }
+    const group_dropdownMenu = document.getElementById('group-dropdown-menu');
+    let group_mySelectedItems = [...initialGroups];
 
-            group_dropdownButton.innerHTML = group_mySelectedItems.length > 0
-                ? group_mySelectedItems.join('<br>') : 'Select group to add layer to';
+    function handleCB2(event) {
+        const group_checkbox = event.target;
+        if (group_checkbox.checked) {
+            group_mySelectedItems.push(group_checkbox.value);
+        } else {
+            group_mySelectedItems =
+              group_mySelectedItems.filter((item) => item !== group_checkbox.value);
         }
 
-        group_dropdownMenu.addEventListener('change', handleCB2);
+        group_dropdownButton.innerHTML = group_mySelectedItems.length > 0
+            ? group_mySelectedItems.join('<br>') : 'Select group to add layer to';
+    }
+
+    group_dropdownMenu.addEventListener('change', handleCB2);
 
 
 </script>
