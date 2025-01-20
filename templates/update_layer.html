@@ -125,8 +125,8 @@
 <!-- Update UI after selection -->
 <script>
     // set initial selected items for departments & groups
-    const initialDepartments = "{{ layer_data[2] }}".split(', ');
-    const initialGroups = "{{ layer_data[3] }}".split(', ');
+    const initialDepartments = "{{ layer_data[2] }}".split(', ').filter(item => item.trim() !== '');
+    const initialGroups = "{{ layer_data[3] }}".split(', ').filter(item => item.trim() !== '');
 
     // live update selection for layer's departments
     const department_dropdownButton = document.getElementById('button8');
@@ -169,7 +169,7 @@
         }
 
         group_dropdownButton.innerHTML = group_mySelectedItems.length > 0
-            ? group_mySelectedItems.join('<br>') : 'Select group to add layer to';
+            ? group_mySelectedItems.join('<br>') : 'Edit group to add layer to';
     }
 
     group_dropdownMenu.addEventListener('change', handleCB2);

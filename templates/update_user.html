@@ -41,7 +41,7 @@
                         id="button10"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        Edit Department
+                        {{ user_data[2] | default('Edit department to add user to') }}
                         <span class="dropdown-icon"></span>
                     </button>
 
@@ -78,7 +78,7 @@
                         id="button11"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        Edit Group
+                        {{ user_data[3] | default('Edit group to add user to') }}
                         <span class="dropdown-icon"></span>
                     </button>
 
@@ -114,7 +114,7 @@
                             id="button12"
                             data-bs-toggle="dropdown"
                             aria-expanded="false">
-                        Select dashboards the user will own
+                            {{ user_data[6] | default('Edit dashboards the user will own') }}
                         <span class="dropdown-icon"></span>
                     </button>
 
@@ -163,71 +163,80 @@
 
 <!-- Update UI after selection -->
 <script>
+    // set initial selected items for departments, groups & dashboards
+    const initialDepartments = "{{ user_data[2] }}".split(', ').filter(item => item.trim() !== '');
+    const initialGroups = "{{ user_data[3] }}".split(', ').filter(item => item.trim() !== '');
+    const initialDashboards = "{{ user_data[6] | default('') }}".split(', ').filter(item => item.trim() !== '');
+
+
     // live update selection for user's departments
-    const department_dropdownButton =
-              document.getElementById('button10');
-        const department_dropdownMenu =
-              document.getElementById('department-dropdown-menu');
-        let department_mySelectedItems = [];
+    const department_dropdownButton = document.getElementById('button10');
+    department_dropdownButton.innerHTML = initialDepartments.length > 0
+        ? initialDepartments.join('<br>') : 'Edit department to add layer to';
 
-        function handleCB1(event) {
-            const department_checkbox = event.target;
-            if (department_checkbox.checked) {
-                department_mySelectedItems.push(department_checkbox.value);
-            } else {
-                department_mySelectedItems =
-                  department_mySelectedItems.filter((item) => item !== department_checkbox.value);
-            }
+    const department_dropdownMenu = document.getElementById('department-dropdown-menu');
+    let department_mySelectedItems = [...initialDepartments];
 
-            department_dropdownButton.innerHTML = department_mySelectedItems.length > 0
-                ? department_mySelectedItems.join('<br>') : 'Select department to add layer to';
+    function handleCB1(event) {
+        const department_checkbox = event.target;
+        if (department_checkbox.checked) {
+            department_mySelectedItems.push(department_checkbox.value);
+        } else {
+            department_mySelectedItems =
+              department_mySelectedItems.filter((item) => item !== department_checkbox.value);
         }
 
-        department_dropdownMenu.addEventListener('change', handleCB1);
+        department_dropdownButton.innerHTML = department_mySelectedItems.length > 0
+            ? department_mySelectedItems.join('<br>') : 'Select department to add user to';
+    }
+
+    department_dropdownMenu.addEventListener('change', handleCB1);
 
     // live update selection for user's groups
-    const group_dropdownButton =
-              document.getElementById('button11');
-        const group_dropdownMenu =
-              document.getElementById('group-dropdown-menu');
-        let group_mySelectedItems = [];
+    const group_dropdownButton = document.getElementById('button11');
+    group_dropdownButton.innerHTML = initialGroups.length > 0
+        ? initialGroups.join('<br>') : 'Edit group to add user to';
 
-        function handleCB2(event) {
-            const group_checkbox = event.target;
-            if (group_checkbox.checked) {
-                group_mySelectedItems.push(group_checkbox.value);
-            } else {
-                group_mySelectedItems =
-                  group_mySelectedItems.filter((item) => item !== group_checkbox.value);
-            }
+    const group_dropdownMenu = document.getElementById('group-dropdown-menu');
+    let group_mySelectedItems = [...initialGroups];
 
-            group_dropdownButton.innerHTML = group_mySelectedItems.length > 0
-                ? group_mySelectedItems.join('<br>') : 'Select group to add layer to';
+    function handleCB2(event) {
+        const group_checkbox = event.target;
+        if (group_checkbox.checked) {
+            group_mySelectedItems.push(group_checkbox.value);
+        } else {
+            group_mySelectedItems =
+              group_mySelectedItems.filter((item) => item !== group_checkbox.value);
         }
 
-        group_dropdownMenu.addEventListener('change', handleCB2);
+        group_dropdownButton.innerHTML = group_mySelectedItems.length > 0
+            ? group_mySelectedItems.join('<br>') : 'Select group to add user to';
+    }
+
+    group_dropdownMenu.addEventListener('change', handleCB2);
 
     // live update selection for dashboards that user owns
-    const dashboard_dropdownButton =
-              document.getElementById('button12');
-        const dashboard_dropdownMenu =
-              document.getElementById('dashboard-dropdown-menu');
-        let dashboard_mySelectedItems = [];
+    const dashboard_dropdownButton = document.getElementById('button12');
+    dashboard_dropdownButton.innerHTML = initialDashboards.length > 0
+        ? initialDashboards.join('<br>') : 'Edit dashboards the user will own';
 
-        function handleCB3(event) {
-            const dashboard_checkbox = event.target;
-            if (dashboard_checkbox.checked) {
-                dashboard_mySelectedItems.push(dashboard_checkbox.value);
-            } else {
-                dashboard_mySelectedItems =
-                  dashboard_mySelectedItems.filter((item) => item !== dashboard_checkbox.value);
-            }
+    const dashboard_dropdownMenu = document.getElementById('dashboard-dropdown-menu');
+    let dashboard_mySelectedItems = [...initialDashboards];
 
-            dashboard_dropdownButton.innerHTML = dashboard_mySelectedItems.length > 0
-                ? dashboard_mySelectedItems.join('<br>') : 'Select dashboards the user will own';
+    function handleCB3(event) {
+        const dashboard_checkbox = event.target;
+        if (dashboard_checkbox.checked) {
+            dashboard_mySelectedItems.push(dashboard_checkbox.value);
+        } else {
+            dashboard_mySelectedItems =
+              dashboard_mySelectedItems.filter((item) => item !== dashboard_checkbox.value);
         }
 
-        dashboard_dropdownMenu.addEventListener('change', handleCB3);
+        dashboard_dropdownButton.innerHTML = dashboard_mySelectedItems.length > 0
+            ? dashboard_mySelectedItems.join('<br>') : 'Edit dashboards the user will own';
+    }
+
+    dashboard_dropdownMenu.addEventListener('change', handleCB3);
 </script>
 
 <br>
