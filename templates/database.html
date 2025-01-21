@@ -45,9 +45,9 @@
                             <th colspan="{{ grouped_items[department] | length or 1 }}" class="text-center" id="department_name">{{ department }}</th>
                             {% endfor %}
                         </tr>
-                        <tr class="sticky-row">
+                        <tr>
                             <th style="width: 40px;"></th>
-                            <th style="width: 150px;" id="right-border-1">Name</th>
+                            <th style="width: 150px;" id="right-border-1">User</th>
                             {% for department in departments %}
                                 {% for item in grouped_items[department] %}
                                 <th class="rotate-90 {% if loop.first %}leftmost-border{% endif %} {% if loop.last %}rightmost-border{% endif %}">
@@ -63,7 +63,7 @@
                     <tbody>
                         {% for user in users %}
                         <tr>
-                            <td>
+                            <td class="text-center align-middle">
                                 <i class="fa-solid fa-circle-info"
                                     data-bs-toggle="popover"
                                     data-bs-title="{{ ', '.join(user.department) }}"
