@@ -51,6 +51,54 @@ def logout():
     return redirect(url_for('login'))
 
 
+def recalculate_user_permissions(cursor, user):
+    # extract user details
+    user_id, name, department, groups, editor, viewer, owner = user
+    user_groups = set(groups.split(', '))
+
+    # fetch all layers & dashboards
+    cursor.execute('SELECT name, groups FROM layers')
+    layers = cursor.fetchall()
+    cursor.execute('SELECT name, groups FROM dashboards')
+    dashboards = cursor.fetchall()
+
+    # initialise permissions
+    updated_editor_layers = set()
+    updated_viewer_layers = set()
+    updated_owner_dashboards = set()
+
+    # process layer permissions
+    for layer_name, layer_groups in layers:
+        layer_groups_set = set(group.strip() for group in layer_groups.split(', '))
+        overlap = user_groups.intersection(layer_groups_set)
+
+        if overlap:
+            if overlap == {'IDE - General Viewers'}:
+                updated_viewer_layers.add(layer_name)
+            elif len(overlap) > 1 or not {'IDE - General Viewers'}.issubset(overlap):
+                updated_editor_layers.add(layer_name)
+                updated_viewer_layers.add(layer_name)
+
+    # Process dashboard permissions
+    for dashboard_name, dashboard_group in dashboards:
+        dashboard_group_set = set(group.strip() for group in dashboard_group.split(', '))
+        overlap = user_groups.intersection(dashboard_group_set)
+
+        if overlap:
+            updated_viewer_layers.add(dashboard_name)
+
+    # Convert to comma-separated strings
+    updated_editor = ', '.join(updated_editor_layers)
+    updated_viewer = ', '.join(updated_viewer_layers)
+
+    # Update the user's permissions in the database
+    cursor.execute('''
+        UPDATE users
+        SET editor = ?, viewer = ?
+        WHERE id = ?
+        ''', (updated_editor, updated_viewer, user_id))
+
+
 @app.route('/add_layer', methods=['POST', 'GET'])
 @login_required
 def add_layer():
@@ -92,6 +140,16 @@ def add_layer():
             conn.commit()
 
             print('Layer added successfully!')
+
+            # recalculate permissions for all users
+            cursor.execute('SELECT * FROM users')
+            all_users = cursor.fetchall()
+            for user in all_users:
+                recalculate_user_permissions(cursor, user)
+
+            conn.commit()
+
+            print('update user permissions after adding layer!')
             return redirect(url_for('all_layers'))
 
         except sqlite3.Error as e:
@@ -154,6 +212,15 @@ def update_layer(layer_id):
                     ''', (updated_name, department_string, group_string, layer_id,))
             conn.commit()
 
+            # recalculate permissions for all users
+            cursor.execute('SELECT * FROM users')
+            all_users = cursor.fetchall()
+            for user in all_users:
+                recalculate_user_permissions(cursor, user)
+
+            conn.commit()
+
+            print('update user permissions after updating layer!')
             return redirect(url_for('all_layers'))
 
         except sqlite3.Error as e:
