@@ -61,16 +61,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for user in users %}
-                        <tr>
-                            <td class="text-center align-middle">
-                                <i class="fa-solid fa-circle-info"
-                                    data-bs-toggle="popover"
-                                    data-bs-title="{{ ', '.join(user.department) }}"
-                                    data-bs-content="{% for group in user.groups %}&bull; {{ group }}<br>{% endfor %}"
-                                    style="cursor: pointer">
-                                </i>
-                            </td>
+                    {% for user in users %}
+                    <tr>
+                        <td class="text-center align-middle">
+                            <i class="fa-solid fa-circle-info"
+                               data-bs-toggle="popover"
+                               data-bs-title="{% if user.department %} {{ ', '.join(user.department) }} {% else %} '' {% endif %}"
+                               data-bs-content="{% if user.groups and user.groups|length > 0 %}
+                            {% for group in user.groups %}&bull; {{ group }}<br>{% endfor %}
+                        {% else %}
+                            No Groups
+                        {% endif %}"
+                               style="cursor: pointer">
+                            </i>
+                        </td>
 
                             <!-- Name -->
                             <td id="right-border-2">{{ user.name }}</td>

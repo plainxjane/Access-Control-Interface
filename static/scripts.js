@@ -109,3 +109,12 @@ function performSearch() {
     window.location.href = `/database?query=${encodeURIComponent(query)}`;
 }
 
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize all popovers
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    popoverTriggerList.forEach(function (popoverTriggerEl) {
+        new bootstrap.Popover(popoverTriggerEl);
+    });
+});
+
