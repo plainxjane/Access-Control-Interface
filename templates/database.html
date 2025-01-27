@@ -33,7 +33,8 @@
     </div>
     <div class="row mt-4">
         <div class="col">
-            <div class="table-responsive" style="overflow-x: auto;">
+            <div class="table-container">
+            <div class="table-responsive" style="overflow: auto;">
                 <table class="table table-bordered table-header-rotated" id="users-table">
                     <thead>
                         <tr class="empty-row">
@@ -55,7 +56,7 @@
                                 </th>
                                 {% endfor %}
                                 {% if grouped_items[department] | length == 0 %}
-                                <th></th>
+                                <th class="sticky-header"></th>
                                 {% endif %}
                             {% endfor %}
                         </tr>
@@ -111,6 +112,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
             </div>
         </div>
     </div>
