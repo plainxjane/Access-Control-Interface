@@ -150,40 +150,5 @@ table.table-bordered {
     border-color: #1e2d47;
 }
 
-/* Freeze the info icon column */
-#users-table tbody td:nth-child(1),
-#users-table thead th:nth-child(1) {
-    position: sticky;
-    left: 0; /* Keep it in place horizontally */
-    z-index: 2; /* Ensure it stays above other columns */
-    background-color: #ffffff; /* Solid background to avoid overlap */
-    border-right: 1px solid black; /* Retain the border */
-}
-
-/* Freeze the user name column */
-#users-table tbody td:nth-child(2),
-#users-table thead th:nth-child(2) {
-    position: sticky;
-    left: 80px; /* Offset based on the width of the first column */
-    z-index: 1; /* Ensure it stays above scrolling content */
-    background-color: #ffffff; /* Solid background to avoid overlap */
-    border-right: 1px solid black; /* Retain the border */
-    border-left: 1px solid black;
-}
-
-/* Freeze the info icon column */
-#users-table tbody td:nth-child(1),
-#users-table thead th:nth-child(1) {
-    position: sticky;
-    left: 0; /* Keep it in place horizontally */
-    z-index: 2; /* Ensure it stays above other columns */
-    background-color: #ffffff; /* Solid background to avoid overlap */
-    border-right: 1px solid #dee2e6; /* Retain the border */
-}
-
-/* Optional: Add a subtle shadow to enhance visibility of sticky columns */
-#users-table tbody td:nth-child(1),
-#users-table tbody td:nth-child(2) {
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Adds a shadow on the right side */
-}
-
+#users-table thead td:nth-child(1),
+#users-table thead

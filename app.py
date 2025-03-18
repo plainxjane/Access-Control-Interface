@@ -1,8 +1,7 @@
 from flask import Flask, g, flash, request, redirect, render_template, url_for, session, jsonify
 from models.Forms import LoginForm, AddLayerForm, UpdateLayerForm, AddUserForm, UpdateUserForm, AddDepartmentForm, \
     AddGroupForm, AddDashboardForm, UpdateDashboardForm
-from wrappers import login_required
-import sqlite3
+import sqlite3, requests
 
 
 app = Flask(__name__)
@@ -12,43 +11,131 @@ DATABASE = 'database.db'
 # config app
 app.config['SECRET_KEY'] = 'SECRET_KEY'
 
+# ArcGIS OAuth details
+# ARCGIS_CLIENT_ID = "X0HS2agHOXwNSChB"
+# ARCGIS_CLIENT_SECRET = "fe22544ff4484415a0833a8c74f1136f"
+# REDIRECT_URI = "http://127.0.0.1:5000/callback"
+# ARCGIS_AUTH_URL = "https://ltasg.maps.arcgis.com/sharing/rest/oauth2/authorize"
+# ARCGIS_TOKEN_URL = "https://ltasg.maps.arcgis.com/sharing/rest/oauth2/token"
+ARCGIS_CLIENT_ID = "NBkSzbz6sZePRP2l"
+ARCGIS_CLIENT_SECRET = "64967a23753043d383dcbe30c0f85efe"
+REDIRECT_URI = "http://127.0.0.1:5000/callback"
+ARCGIS_AUTH_URL = "https://ignite.lta.gov.sg/portal/sharing/rest/oauth2/authorize"
+ARCGIS_TOKEN_URL = "https://ignite.lta.gov.sg/portal/sharing/rest/oauth2/token"
 
 @app.route('/')
-@login_required
 def home():
-    return render_template('homepage.html')
+    # check if user is authenticated
+    if "access_token" not in session:
+        return redirect('/login')
+
+    # if authenticated, redirect to homepage
+    return render_template("homepage.html", authenticated=True)
 
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/login')
 def login():
-    login_form = LoginForm()
-    login_failed = False
+    # redirect to ArcGIS OAuth2 login page
+    return redirect(f"{ARCGIS_AUTH_URL}?client_id={ARCGIS_CLIENT_ID}&response_type=code&redirect_uri={REDIRECT_URI}")
 
-    if request.method == 'POST' and login_form.validate_on_submit():
-        password = login_form.password.data
 
-        if password == 'S&Lrail8':
-            session['logged_in'] = True
-            print("Login Successful!")
+@app.route('/callback')
+def callback():
+    """Handles OAuth callback and stores token in session."""
+    print(request.args)
+    code = request.args.get("code")
 
-            return redirect(url_for('home'))
+    if code:
+        token_url = ARCGIS_TOKEN_URL
+        params = {
+        "client_id": ARCGIS_CLIENT_ID,
+        "client_secret": ARCGIS_CLIENT_SECRET,
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": REDIRECT_URI,
+        }
+
+        response = requests.post(ARCGIS_TOKEN_URL, data=params)
+        token_data = response.json()
+
+        if response.status_code == 200:
+            # save the OAuth token in the session
+            session['oauth_token'] = token_data['access_token']
+            print('Access token received:', session['oauth_token'])
+            return redirect(url_for('database'))
 
         else:
-            flash('Login Unsuccessful. Please try again.', 'danger')
-            login_failed = True
+            return f"Error: {token_data.get('error_description', 'Unknown error')}"
 
-    return render_template('login.html', form=login_form, login_failed=login_failed)
+    else:
+        return "Error: No authorization code received"
+
+
+# @app.route('/login', methods=['POST', 'GET'])
+# def login():
+#     login_form = LoginForm()
+#     login_failed = False
+#
+#     if request.method == 'POST' and login_form.validate_on_submit():
+#         password = login_form.password.data
+#
+#         if password == 'S&Lrail8':
+#             session['logged_in'] = True
+#             print("Login Successful!")
+#
+#             return redirect(url_for('home'))
+#
+#         else:
+#             flash('Login Unsuccessful. Please try again.', 'danger')
+#             login_failed = True
+#
+#     return render_template('login.html', form=login_form, login_failed=login_failed)
 
 
 @app.route('/logout')
-@login_required
 def logout():
-    # remove login state
-    session.pop('logged_in', None)
-    flash("You have been logged out.", 'info')
-    print("Logged out!")
+    session.pop('access_token', None)
+    return redirect('/')
 
-    return redirect(url_for('login'))
+
+@app.route('/get_users', methods=['GET'])
+def get_users():
+    # get OAuth token from session
+    oauth_token = session.get('oauth_token')
+
+    if not oauth_token:
+        return "No OAuth token found. Please log in first."
+
+    url = "https://ltasg.maps.arcgis.com/sharing/rest/portals/self/users/search"
+    params = {
+            'f': 'json',
+            'token': oauth_token,
+            'q': '*',       # fetch all users
+            'num': 100,     # max no. per request
+            'start': 1,     # start at first user
+        }
+
+    all_users = []
+
+    while True:
+        response = requests.get(url, params=params)
+
+        if response.status_code != 200:
+            return f"Error retrieving users: {response.status_code} - {response.text}"
+
+        data = response.json()
+        users = data.get('results', [])
+        all_users.extend(users)
+
+        # check if there is another page
+        if 'nextStart' in data and data['nextStart'] > 0:
+            params['start'] = data['nextStart']     # move to next page
+        else:
+            break       # no more users to fetch
+
+    count_users = len(all_users)
+
+    return render_template('get_users.html', users=all_users, count_users=count_users)
 
 
 def recalculate_user_permissions(cursor, user):
@@ -100,7 +187,6 @@ def recalculate_user_permissions(cursor, user):
 
 
 @app.route('/add_layer', methods=['POST', 'GET'])
-@login_required
 def add_layer():
     add_layer_form = AddLayerForm()
 
@@ -160,7 +246,6 @@ def add_layer():
 
 
 @app.route('/update_layer/<int:layer_id>', methods=['POST', 'GET'])
-@login_required
 def update_layer(layer_id):
     # connect to database
     conn = sqlite3.connect(DATABASE)
@@ -231,7 +316,6 @@ def update_layer(layer_id):
 
 
 @app.route('/delete_layer/<int:layer_id>', methods=['POST', 'GET'])
-@login_required
 def delete_layer(layer_id):
     # connect to database
     conn = sqlite3.connect(DATABASE)
@@ -254,7 +338,6 @@ def delete_layer(layer_id):
 
 
 @app.route('/layers', methods=['GET'])
-@login_required
 def all_layers():
     # connect to database
     conn = sqlite3.connect(DATABASE)
@@ -284,7 +367,6 @@ def all_layers():
 
 
 @app.route('/add_user', methods=['POST', 'GET'])
-@login_required
 def add_user():
     add_user_form = AddUserForm()
 
@@ -407,7 +489,6 @@ def add_user():
 
 
 @app.route('/update_user/<int:user_id>', methods=['POST', 'GET'])
-@login_required
 def update_user(user_id):
     # fetch user's data from database
     conn = sqlite3.connect(DATABASE)
@@ -536,7 +617,6 @@ def update_user(user_id):
 
 
 @app.route('/delete_user/<int:user_id>', methods=['POST'])
-@login_required
 def delete_user(user_id):
     # connect to database
     conn = sqlite3.connect(DATABASE)
@@ -559,7 +639,6 @@ def delete_user(user_id):
 
 
 @app.route('/users', methods=['GET'])
-@login_required
 def all_users():
     # connect to database
     conn = sqlite3.connect(DATABASE)
@@ -614,7 +693,6 @@ def all_users():
 
 
 @app.route('/add_dashboard', methods=['POST', 'GET'])
-@login_required
 def add_dashboard():
     add_dashboard_form = AddDashboardForm()
 
@@ -668,7 +746,6 @@ def add_dashboard():
 
 
 @app.route('/update_dashboard/<int:dashboard_id>', methods=['POST', 'GET'])
-@login_required
 def update_dashboard(dashboard_id):
     # connect to database
     conn = sqlite3.connect(DATABASE)
@@ -734,7 +811,6 @@ def update_dashboard(dashboard_id):
 
 
 @app.route('/delete_dashboard/<int:dashboard_id>', methods=['POST', 'GET'])
-@login_required
 def delete_dashboard(dashboard_id):
     # connect to database
     conn = sqlite3.connect(DATABASE)
@@ -757,7 +833,6 @@ def delete_dashboard(dashboard_id):
 
 
 @app.route('/dashboards', methods=['GET'])
-@login_required
 def all_dashboards():
     # connect to database
     conn = sqlite3.connect(DATABASE)
@@ -778,7 +853,6 @@ def all_dashboards():
 
 
 @app.route('/database', methods=['GET'])
-@login_required
 def database():
     # connect to database
     conn = sqlite3.connect(DATABASE)
@@ -854,7 +928,6 @@ def database():
 
 
 @app.route('/add_department_group', methods=['POST', 'GET'])
-@login_required
 def add_department_group():
     # connect to sqlite database
     conn = sqlite3.connect(DATABASE)
