@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %} All Users {% endblock %}
+
+{% block content %}
+
+<br>
+<!-- Groups Table -->
+<div class="container-fluid px-4">
+    <div class="row me-auto mb-2 mb-lg-0">
+        <h1>All Groups</h1>
+        <p>No. of groups: {{ count_groups }}</p>
+    </div>
+    <div class="row mt-4>">
+        <div class="col">
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="table table-bordered table-header-rotated" id="users-table">
+                    <thead>
+                    <tr id="row_2">
+                        <th>
+                            Name
+                        </th>
+                        <th>ID</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for group in all_groups %}
+                    <tr>
+                        <!-- Username -->
+                        <td>{{ group.title }}</td>
+                        <!-- Name -->
+                        <td>
+                            {{ group.id }}
+                        </td>
+                        <!-- Access Level -->
+                        <td>
+                            {{ group.description }}
+                        </td>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

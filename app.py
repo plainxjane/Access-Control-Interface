@@ -2,6 +2,7 @@ from flask import Flask, g, flash, request, redirect, render_template, url_for, 
 from models.Forms import LoginForm, AddLayerForm, UpdateLayerForm, AddUserForm, UpdateUserForm, AddDepartmentForm, \
     AddGroupForm, AddDashboardForm, UpdateDashboardForm
 import sqlite3, requests
+from arcgis.gis import GIS
 
 
 app = Flask(__name__)
@@ -17,9 +18,11 @@ app.config['SECRET_KEY'] = 'SECRET_KEY'
 # REDIRECT_URI = "http://127.0.0.1:5000/callback"
 # ARCGIS_AUTH_URL = "https://ltasg.maps.arcgis.com/sharing/rest/oauth2/authorize"
 # ARCGIS_TOKEN_URL = "https://ltasg.maps.arcgis.com/sharing/rest/oauth2/token"
-ARCGIS_CLIENT_ID = "NBkSzbz6sZePRP2l"
-ARCGIS_CLIENT_SECRET = "64967a23753043d383dcbe30c0f85efe"
-REDIRECT_URI = "http://127.0.0.1:5000/callback"
+
+ARCGIS_PORTAL_URL = "https://ignite.lta.gov.sg/portal/home"
+ARCGIS_CLIENT_ID = "3g0BXQs78qg1a9at"
+ARCGIS_CLIENT_SECRET = "e6270113788a475a8587244e8e092f8b"
+REDIRECT_URI = "http://localhost:5000/callback"
 ARCGIS_AUTH_URL = "https://ignite.lta.gov.sg/portal/sharing/rest/oauth2/authorize"
 ARCGIS_TOKEN_URL = "https://ignite.lta.gov.sg/portal/sharing/rest/oauth2/token"
 
@@ -31,6 +34,7 @@ def home():
 
     # if authenticated, redirect to homepage
     return render_template("homepage.html", authenticated=True)
+    # return render_template("homepage.html")
 
 
 @app.route('/login')
@@ -98,6 +102,7 @@ def logout():
     return redirect('/')
 
 
+# retrieve users on Ignite with ArcGIS Rest JS
 @app.route('/get_users', methods=['GET'])
 def get_users():
     # get OAuth token from session
@@ -106,7 +111,7 @@ def get_users():
     if not oauth_token:
         return "No OAuth token found. Please log in first."
 
-    url = "https://ltasg.maps.arcgis.com/sharing/rest/portals/self/users/search"
+    url = "https://ignite.lta.gov.sg/portal/sharing/rest/portals/self/users/search"
     params = {
             'f': 'json',
             'token': oauth_token,
@@ -135,7 +140,103 @@ def get_users():
 
     count_users = len(all_users)
 
-    return render_template('get_users.html', users=all_users, count_users=count_users)
+    return render_template('get_users.html', all_users=all_users, count_users=count_users)
+
+
+# @app.route('/get_users', methods=['GET'])
+# def get_users():
+#     # get OAuth token from session
+#     oauth_token = session.get('oauth_token')
+#
+#     # redirect to login if not authenticated
+#     if not oauth_token:
+#         return "No OAuth token found. Please log in first."
+#
+#     # use OAuth token to authenticate with ArcGIS
+#     gis = GIS(ARCGIS_PORTAL_URL, token=oauth_token)
+#     print(f"Logged in as: {gis.users.me.username}")
+#
+#     # search for groups
+#     all_users = gis.users.search('q:*', max_users=5000)
+#     print(all_users)
+#
+#     count_users = len(all_users)
+#
+#     return render_template('get_users.html', all_users=all_users, count_users=count_users)
+
+
+@app.route('/get_groups', methods=['GET'])
+def get_groups():
+    # get OAuth token from session
+    oauth_token = session.get('oauth_token')
+
+    # redirect to login if not authenticated
+    if not oauth_token:
+        return "No OAuth token found. Please log in first."
+
+    # use OAuth token to authenticate with ArcGIS
+    gis = GIS(ARCGIS_PORTAL_URL, token=oauth_token)
+    print(f"Logged in as: {gis.users.me.username}")
+
+    # search for groups
+    all_groups = gis.groups.search('q:*', max_groups=1000)
+    print(all_groups)
+
+    count_groups = len(all_groups)
+
+    return render_template('get_groups.html', all_groups=all_groups, count_groups=count_groups)
+
+
+# @app.route('/get_groups', methods=['GET'])
+# def get_groups():
+#     # get OAuth token from session
+#     oauth_token = session.get('oauth_token')
+#
+#     if not oauth_token:
+#         return "No OAuth token found. Please log in first."
+#
+#     url = "https://ignite.lta.gov.sg/portal/home/groups"
+#     params = {
+#             'f': 'json',
+#             'token': oauth_token,
+#             'q': '*',       # fetch all users
+#             'num': 100,     # max no. per request
+#             'start': 1,     # start at first user
+#         }
+#
+#     all_groups = []
+#
+#     while True:
+#         response = requests.get(url, params=params)
+#
+#         # Check and print the Content-Type header
+#         print("Response Status Code:", response.status_code)
+#         print("Response Content-Type:", response.headers.get('Content-Type'))
+#
+#         # If not JSON, return the raw content
+#         if response.status_code != 200:
+#             return f"Error retrieving groups: {response.status_code} - {response.text}"
+#
+#         if 'application/json' not in response.headers.get('Content-Type', ''):
+#             return f"Expected JSON response but got: {response.headers.get('Content-Type')}\n{response.text}"
+#
+#         try:
+#             data = response.json()
+#         except requests.exceptions.JSONDecodeError:
+#             return f"Error decoding JSON: {response.text}"
+#
+#         groups = data.get('results', [])
+#         all_groups.extend(groups)
+#
+#         # Check if there is another page
+#         if 'nextStart' in data and data['nextStart'] > 0:
+#             params['start'] = data['nextStart']
+#         else:
+#             break  # No more groups to fetch
+#
+#     count_groups = len(all_groups)
+#
+#     return render_template('get_groups.html', all_groups=all_groups, count_groups=count_groups)
 
 
 def recalculate_user_permissions(cursor, user):
